@@ -1,9 +1,8 @@
 // contracts/OverPass.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
 
-abstract contract OverPass is ERC20 {
+abstract contract OverPass {
 
     struct Task {
         address taskOwner;
@@ -17,16 +16,20 @@ abstract contract OverPass is ERC20 {
         uint computePeriod;
     }
 
-    event postNewQuestion(uint256 taskId, uint incentive, uint approxGasFee, uint computePeriod);
+    event postNewQuestion(uint256 taskId, uint incentive, uint approxGasFee, uint computePeriod, string[] taskParameters);
     event updateQuestionAnswer(uint256 taskId, uint bestAnswer, address bestAdvisor);
+    event complateQuestion(uint256 taskId, uint bestAnswer, address bestAdvisor);
+
 
     // Store the information of tasks
     mapping(uint256=>Task) internal tasks;
 
-    uint internal nonce;
+    uint internal nonce=1;
+    string problemName;
 
-    constructor(uint256 initialSupply) ERC20("OverPass", "OP") {
-        _mint(msg.sender, initialSupply);
+    constructor(string memory _problemName) {
+        problemName = _problemName;
+
     }
 
     modifier winnerOnly(uint256 _taskId) {
@@ -42,8 +45,18 @@ abstract contract OverPass is ERC20 {
     // called by other smart contract to compute specified algorithm with parameters
     function delegate_compute(string[] memory taskParameters, uint _computePeriod) payable public virtual returns (uint256);
     // return parameters of a function
-    function getTaskParameters(uint256 taskId) public view virtual returns(string[] memory);
     function advise(uint256 taskId, uint256 ans, string[] memory proof) payable public virtual;
+
     function getIncentive(uint256 _taskId) public virtual;
+        function getTaskIncentive(uint256 taskId) public view returns(uint) {
+        return tasks[taskId].incentive;
+    }
+    function getTaskApproxGasFee(uint256 taskId) public view returns(uint){
+        return tasks[taskId].approxGasFee;
+    }
+        // return parameters of a function
+    function getTaskParameters(uint256 taskId) public view returns (string[] memory){
+        return tasks[taskId].taskParameters;
+    }
 }
 

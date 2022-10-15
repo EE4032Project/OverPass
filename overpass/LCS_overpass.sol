@@ -6,8 +6,10 @@ import "./overpass.sol";
 
 contract LCSOverPass is OverPass{
 
-    constructor(uint256 initialSupply) OverPass((initialSupply)) {
+    constructor() OverPass(("LCS")) {
     }
+
+    mapping(uint=>uint) answers;
 
 
     // simulate the verification to estimate the gas fee
@@ -31,12 +33,13 @@ contract LCSOverPass is OverPass{
         if (checkI!=s1.length) {
             return false;
         }
+        checkI=0;
         // simulate check over s2
         for (uint i=0; i<s2.length; i++) {
             if (checkI==s2.length) {
                 break;
             }
-            if (s2[i]==s1[checkI]) {
+            if (s2[i]==s2[checkI]) {
                 checkI +=1;
             } else {
                 continue;
@@ -91,20 +94,17 @@ contract LCSOverPass is OverPass{
         require(msg.value>tx.gasprice*10, "not enough payment.");
         // set new task
 
-        tasks[nonce] = Task(msg.sender, nonce, taskParameters, address(0), 0,  msg.value, tx.gasprice, block.number, _computePeriod);
+        tasks[nonce] = Task(msg.sender, nonce, taskParameters, msg.sender, 0,  msg.value, tx.gasprice, block.number, _computePeriod);
         
-        emit postNewQuestion(/*taskId*/nonce, /*incentive*/msg.value, /*approxGasFee*/tx.gasprice, _computePeriod);
+        emit postNewQuestion(/*taskId*/nonce, /*incentive*/msg.value, /*approxGasFee*/tx.gasprice, _computePeriod, taskParameters);
         nonce += 1;
         return nonce-1;
     }
 
-    // return parameters of a function
-    function getTaskParameters(uint256 taskId) public view override returns (string[] memory){
-        return tasks[taskId].taskParameters;
-    }
+
 
     function advise(uint256 taskId, uint256 ans, string[] memory proof) payable public override {
-        
+        require(tasks[taskId].taskId>0, "task not exist");
         require(ans>tasks[taskId].bestAnswer, "Better solution exists");
         require(proof.length==1, "Invalid proof");
         bytes memory s1 = bytes(tasks[taskId].taskParameters[1]);
@@ -114,14 +114,24 @@ contract LCSOverPass is OverPass{
         require(isValidAns, "Invalid proof");
         tasks[taskId].bestAdvisor = msg.sender;
         tasks[taskId].bestAnswer = ans;
+        answers[taskId] = ans;
         emit updateQuestionAnswer(taskId, ans, msg.sender);
 
     }
 
     function getIncentive(uint256 _taskId) public override winnerOnly(_taskId) {
-        super.transfer(msg.sender, tasks[_taskId].incentive);
+        uint incentive = tasks[_taskId].incentive;
+        (bool success, )  = msg.sender.call{value: incentive}(""); 
+        require(success, "Failed to transfer the incentive");
         delete tasks[_taskId];
+        emit complateQuestion(_taskId, tasks[_taskId].bestAnswer, tasks[_taskId].bestAdvisor);
     }
+
+    function checkAns(uint256 taskId) public view returns (uint) {
+        return answers[taskId];
+    }
+
+
 
 
 }
