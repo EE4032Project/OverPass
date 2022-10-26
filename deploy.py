@@ -57,7 +57,8 @@ class LCSOverPass:
         self.w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
         self.nonce = self.w3.eth.getTransactionCount(self.my_address)
         self.chain_id = self.w3.eth.chain_id
-        self.w3.eth.set_gas_price_strategy(medium_gas_price_strategy)
+        # open to use medium gas price estimation
+        #self.w3.eth.set_gas_price_strategy(medium_gas_price_strategy)
 
         self.w3.middleware_onion.add(middleware.time_based_cache_middleware)
         self.w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
