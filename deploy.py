@@ -1,51 +1,121 @@
-from solcx import compile_standard, install_solc
 import json
-from web3 import Web3
 import random
-with open("./contracts/LCS_overpass.sol", "r") as file:
-    LCS_overpass = file.read()
-
-# Number of transactions
-NUMBER_OF_TRANSACTIONS_BEFORE_COMPROMISE = 10
-NUMBER_OF_TRANSACTIONS_AFTER_COMPROMISE = 200
-# Set the experiement deterministic
-random.seed(10)
+from solcx import compile_standard, install_solc
+import traceback
+from web3 import Web3, middleware
+from web3.gas_strategies.time_based import medium_gas_price_strategy
 
 
-# Compile the solidity
-
-install_solc("0.8.7")
-compiled_sol = compile_standard(
-    {
-        "language": "Solidity",
-        "sources": {"./contracts/LCS_overpass.sol": {"content": LCS_overpass}},
-        "settings": {
-            "outputSelection": {
-                "*": {"*": ["abi", "metadata", "evm.bytecode", "evm.sourceMap"]}
-            }
-        },
-    },
-    solc_version="0.8.7",
-)
 
 
-with open("compiled_code.json", "w") as file:
-    json.dump(compiled_sol, file)
 
-# get bytecode version
-#bytecode = compiled_sol["contracts"]["RTDS.sol"]["RTDS"]["evm"]["bytecode"]["object"]
 
-# get abi
-#abi = compiled_sol["contracts"]["RTDS.sol"]["RTDS"]["abi"]
+class LCSOverPass:
+    contract_address = ""
+    nonce = 0
 
-# connect to ganache
-'''
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-chain_id = w3.eth.chain_id
-'''
+    def __init__(self, _my_address:str, _private_key:str, _contract_address=""):
+
+        self.private_key = _private_key
+        self.my_address = _my_address
+        self.contract_address = _contract_address
+
+
+
+        with open("./overpass/contracts/LCS_overpass.sol", "r") as file:
+            LCS_overpass = file.read()
+        with open("./overpass/contracts/overpass.sol", "r") as file:
+            overpass = file.read()
+
+        # Compile the solidity
+
+        install_solc("0.8.7")
+        compiled_sol = compile_standard({
+                "language": "Solidity",
+                "sources": {"./LCS_overpass.sol": {"content": LCS_overpass}, "./overpass.sol":{"content": overpass}},
+                "settings": {
+                    "outputSelection": {
+                        "*": {"*": ["abi", "metadata", "evm.bytecode", "evm.sourceMap"]}
+                    }
+                },
+            },
+            solc_version="0.8.7",
+        )
+
+
+        with open("./overpass/compiled_code.json", "w") as file:
+            json.dump(compiled_sol, file)
+
+        # get bytecode version
+        self.bytecode = compiled_sol["contracts"]["./LCS_overpass.sol"]["LCSOverPass"]["evm"]["bytecode"]["object"]
+
+        # get abi
+        self.abi = compiled_sol["contracts"]["./LCS_overpass.sol"]["LCSOverPass"]["abi"]
+
+        # connect to ganache
+
+        self.w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+        self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        self.chain_id = self.w3.eth.chain_id
+        self.w3.eth.set_gas_price_strategy(medium_gas_price_strategy)
+
+        self.w3.middleware_onion.add(middleware.time_based_cache_middleware)
+        self.w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
+        self.w3.middleware_onion.add(middleware.simple_cache_middleware)
+
+    def deploy(self):
+        # 1.  Build a transaction
+        overpassContract = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
+        transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": self.w3.eth.gas_price, "from": self.my_address, "nonce": self.nonce})
+        # 2. Sign a transaction
+        signed_txn = self.w3.eth.account.sign_transaction( transaction, private_key=self.private_key)
+        # 3. Send a transaction
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        try:
+            contract_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+
+            # Working with contracts
+            # 1. Contract addresses
+            # 2. Contract ABI
+            self.overpass_instance = self.w3.eth.contract( address=contract_receipt.contractAddress, abi=self.abi)
+            self.contract_address = "0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1"
+            return contract_receipt
+
+        except:
+            return traceback.format_exc()
+
+    def delegate_compute(self, str1:str, str2: str, _incentive: int):
+        transaction = self.overpass_instance.functions.delegate_compute(['LCS',str1,str2], 2).buildTransaction(
+            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.w3.eth.gas_price, "nonce": self.nonce+1, "gas": 3*10**6, "value":_incentive})
+        signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        try:
+            tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+            self.nonce =self.nonce + 1
+            return tx_receipt
+        except:
+            return traceback.format_exc()
+
+
+
+    def getTaskApproxGasFee(self,taskId:int):
+        return self.overpass_instance.functions.getTaskApproxGasFee(taskId).call()
+
+
+
+
 
 my_address = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
 private_key = "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
+
+
+oP_LCS = LCSOverPass(my_address,private_key)
+
+print(oP_LCS.deploy())
+
+print(oP_LCS.delegate_compute("jshdikalk","jdhsifnsd", 10**18))
+
+print(oP_LCS.getTaskApproxGasFee(1))
 
 other_addresses = ["0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0",
                    "0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b",
@@ -68,114 +138,5 @@ other_private_keys = [
     "0x829e924fdf021ba3dbbc4225edfece9aca04b929d6e75613329ca6f1d31c0bb4",
     "0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773"
 ]
-nonceList = [0]*9
-RTDS = w3.eth.contract(abi=abi, bytecode=bytecode)
-print(RTDS)
-
-# Get the latest transaction
-nonce = w3.eth.getTransactionCount(my_address)
-print(nonce)
-
-# Add security policy
-
-# 1.  Build a transaction
-transaction = RTDS.constructor().buildTransaction(
-    {"chainId": chain_id, "gasPrice": w3.eth.gas_price, "from": my_address, "nonce": nonce})
-# 2. Sign a transaction
-signed_txn = w3.eth.account.sign_transaction( transaction, private_key=private_key)
-# 3. Send a transaction
-tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-contract_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-# Working with contracts
-# 1. Contract addresses
-# 2. Contract ABI
-safe_wallet = w3.eth.contract(
-    address=contract_receipt.contractAddress, abi=abi)
 
 
-# Two ways of interact with the contracts
-# 1. Call: Simulate making the call and getting a return value
-# 2. Transact:  actually make a state change
-
-successTransactionNumber = 0
-unSuccessTransactionNumber = 0
-overallGassFee = 0
-
-"""
-for i in range(4):
-    transaction = safe_wallet.functions.addPolicy(i).buildTransaction(
-        {"chainId": chain_id, "from": my_address, "gasPrice": w3.eth.gas_price, "nonce": nonce+1})
-    nonce = nonce + 1
-    signed_txn = w3.eth.account.sign_transaction(
-        transaction, private_key=private_key)
-    # Send this signed transaction
-    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    print(tx_receipt)
-"""
-
-# transact 100 Ether to the RTDS
-
-transaction = safe_wallet.functions.deposit().buildTransaction( {"value": 10*(10**18), "chainId": chain_id, "from": my_address, "gasPrice": w3.eth.gas_price, "nonce": nonce+1})
-nonce = nonce + 1
-signed_txn = w3.eth.account.sign_transaction(
-    transaction, private_key=private_key)
-tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-print("deposit to the safe wallet")
-print(tx_receipt)
-
-
-'''
-# start test
-for i in range(NUMBER_OF_TRANSACTIONS_BEFORE_COMPROMISE):
-    # A random number between [0, 18]
-    randomInt = random.randint(0, 17)
-    # There is 1/2 chance of transfer in
-    if randomInt < 9:
-        transaction = safe_wallet.functions.deposit().buildTransaction({
-            "from": other_addresses[randomInt],
-            "chainId": chain_id,
-            "gasPrice": w3.eth.gas_price,
-            "nonce": nonceList[randomInt],
-            "value": random.randint(1, 10*10**18)
-        })
-        signed_txn = w3.eth.account.sign_transaction(
-            transaction, private_key=other_private_keys[randomInt])
-        nonceList[randomInt] += 1
-        tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-    # There is 1/2 chance of transfer out
-    else:
-        transaction = safe_wallet.functions.transferOut(other_addresses[randomInt-9], random.randint(1, 10*10**18)).buildTransaction(
-            {"chainId": chain_id, "from": my_address, "gasPrice": w3.eth.gas_price, "nonce": nonce+1, "gas": 300000})
-        nonce = nonce + 1
-        signed_txn = w3.eth.account.sign_transaction(transaction, private_key=private_key)
-        tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-        tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        overallGassFee += int(tx_receipt["gasUsed"])
-        print(tx_receipt)
-'''
-'''
-for i in range(NUMBER_OF_TRANSACTIONS_BEFORE_COMPROMISE):
-    randomInt = random.randint(0, 9)
-    amount = random.randint(1, w3.eth.get_balance(
-        contract_receipt.contractAddress))
-    try:
-        transaction = safe_wallet.functions.transferOut_maliciousTest(other_addresses[randomInt-9], amount).buildTransaction(
-            {"chainId": chain_id, "from": my_address, "gasPrice": w3.eth.gas_price, "nonce": nonce+1, "gas": 300000})
-        nonce = nonce + 1
-        signed_txn = w3.eth.account.sign_transaction(
-            transaction, private_key=private_key)
-        tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-        tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        successTransactionNumber += amount
-        overallGassFee += int(tx_receipt["gasUsed"])
-    except:
-        unSuccessTransactionNumber += amount
-
-print("Success transaction number: ", successTransactionNumber)
-print("unSuccess transaction number: ", unSuccessTransactionNumber)
-print("gas used: ", overallGassFee)
-'''
