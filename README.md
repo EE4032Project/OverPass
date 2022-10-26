@@ -32,7 +32,7 @@ brew install --cask anaconda
 ```sh
 brew install node
 ```
-3. Clone githup repo
+3. Clone github repo
 ```sh
 git clone https://github.com/EE4032Project/OverPass.git && cd OverPass
 ```
