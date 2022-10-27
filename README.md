@@ -1,7 +1,5 @@
 # EE4032 (Project title)
 
--
-
 ## Introduction 
 
 Smart contracts provide trust computing. Once a smart contract has been engaged, it will complete exactly how it was coded and no parties can interfere or change the result. However, the computation is usually expensive and slow. There exists a set of problem where there is sign showing that verification on answer is cheaper than searching the answer.  Hence well-defined incentive mechanism can be applied to delegate searching computation to untrusted computational power (off-chain server) while the completeness and soundness of the computation is still guaranteed: 
@@ -40,17 +38,28 @@ git clone https://github.com/EE4032Project/OverPass.git && cd OverPass
 ```sh
 pip3 intsall -r requirements.txt
 ```
-4. open another shell and enter `$OVER_PASS/testnet`
+4. use terminal 1 and enter `$OVER_PASS/testnet`
 ```sh
 sh start_gananche_testnet.sh 100
 ```
 where 100 means generate 100 accounts
-5. run deploy script
+5. use terminal 2 to  deploy LCSOverPass on Truffle network
 ```sh
-python3 deploy.py
+python3 demo.py LCSOverPass
+```
+You can enter number of questions to model
+6. use terminal 3 to play the role in miner
+```sh
+python3 python3 deploy.py LCSOverPassMiner and listen to the contract deployed by terminal 2
+```
+7. use terminal 4 to track the log
+```sh
+tail -f logs.log
 ```
 
 ## Acknowledgement 
+
+
 
 
 
