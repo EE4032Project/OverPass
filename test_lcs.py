@@ -1,1 +1,0 @@
-"<new task begin>\n taskId:{taskId}\n incentive:{incentive}\n approxGasFee:{approxGasFee}\n taskParameters:{taskParameters}\n<new task end>\n\n\n".format(taskId=str(eventInfo["taskId"]),incentive=str(eventInfo["incentive"]),approxGasFee=str(eventInfo["approxGasFee"]),taskParameters=str(eventInfo["taskParameters"]))
