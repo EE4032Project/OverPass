@@ -3,7 +3,7 @@ import json
 import random
 from solcx import compile_standard, install_solc
 import traceback
-from threading import Thread,Lock
+import fcntl
 from web3 import Web3, middleware
 from web3.gas_strategies.time_based import medium_gas_price_strategy
 from constant import MIDIUM_GAS_PRICE_ESTIMATOR_ON, HTTP_PROVIDER, STD_LOGGING_ON,FILE_LOGGING_ON
@@ -11,7 +11,9 @@ import sys
 import time
 import logging
 import queue
-from utils import thread_with_trace
+from utils import thread_with_trace, lock
+import os
+
 
 
 
@@ -56,7 +58,7 @@ class LCSOverPass:
         # connect to ganache
 
         self.w3 = Web3(Web3.HTTPProvider(self.http_provider))
-        self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+
         self.chain_id = self.w3.eth.chain_id
         # open to use medium gas price estimation
         if MIDIUM_GAS_PRICE_ESTIMATOR_ON==True:
@@ -66,6 +68,7 @@ class LCSOverPass:
         self.w3.middleware_onion.add(middleware.simple_cache_middleware)
 
     @staticmethod
+    # Compile LCSOverPass code
     def compileLCSOverPass():
         with open("./overpass/contracts/LCS_overpass.sol", "r") as file:
             LCS_overpass = file.read()
@@ -74,6 +77,7 @@ class LCSOverPass:
         install_solc("0.8.7")
         compiled_sol = compile_standard({
                 "language": "Solidity",
+                # sources should be added here if other .sol is imported
                 "sources": {"./LCS_overpass.sol": {"content": LCS_overpass}, "./overpass.sol":{"content": overpass}},
                 "settings": {
                     "outputSelection": {
@@ -86,7 +90,8 @@ class LCSOverPass:
         with open("./overpass/compiled_code.json", "w") as file:
             json.dump(compiled_sol, file)
         return compiled_sol
-
+    
+    # set contract address for a Contracts
     def setAddress(self, _contract_address: str, _abi:str):
         self.contract_address = _contract_address
         self.abi = _abi
@@ -95,11 +100,14 @@ class LCSOverPass:
         except:
             raise OverPassException("py", traceback.format_exc())
 
-
+    # depoy contract
     def deploy(self):
         if self.overpass_instance == None:
             # 1.  Build a transaction
             overpassContract = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
+            lk = lock.acquire('txn.lock')
+            if lk is None:
+                raise OverPassException("py", traceback.format_exc())
             transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": self.w3.eth.gas_price, "from": self.my_address, "nonce": self.w3.eth.getTransactionCount(self.my_address)})
             # 2. Sign a transaction
             signed_txn = self.w3.eth.account.sign_transaction( transaction, private_key=self.private_key)
@@ -107,36 +115,42 @@ class LCSOverPass:
             tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
             try:
                 contract_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-
-                # Working with contracts
-                # 1. Contract addresses
-                # 2. Contract ABI
                 self.overpass_instance = self.w3.eth.contract( address=contract_receipt.contractAddress, abi=self.abi)
-                self.contract_address = "0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1"
+                self.contract_address = contract_receipt.contractAddress
                 return contract_receipt
 
             except:
                 raise OverPassException("sol", traceback.format_exc())
+            finally:
+                lock.release(lk)
         else:
             raise OverPassException("py", "Contract deployed already")
 
-
+    # delegate a contract
     def delegate_compute(self, str1:str, str2: str, _incentive: int):
+        lk = lock.acquire('txn.lock')
+        if lk is None:
+            raise OverPassException("py", traceback.format_exc())
         transaction = self.overpass_instance.functions.delegate_compute(['LCS',str1,str2], 2).buildTransaction(
             {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.w3.eth.gas_price, "nonce":  self.w3.eth.getTransactionCount(self.my_address), "gas": 3*10**6, "value":_incentive})
         signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
         try:
             tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-            self.nonce =self.nonce + 1
             return tx_receipt
         except:
             raise OverPassException("solidity", traceback.format_exc())
+        finally:
+            lock.release(lk)
 
 
 
     def getTaskApproxGasFee(self,taskId:int):
         return self.overpass_instance.functions.getTaskApproxGasFee(taskId).call()
+
+    def checkAns(self,taskId:int):
+        return self.overpass_instance.functions.checkAns(taskId).call()
+
 
 
 
@@ -150,7 +164,6 @@ class LCSOverPassMiner:
         compiled_sol = LCSOverPass.compileLCSOverPass()
         self.abi = compiled_sol["contracts"]["./LCS_overpass.sol"]["LCSOverPass"]["abi"]
         self.w3 = Web3(Web3.HTTPProvider(self.http_provider))
-        self.nonce = self.w3.eth.getTransactionCount(self.my_address)
         self.chain_id = self.w3.eth.chain_id
         # open to use medium gas price estimation
         if MIDIUM_GAS_PRICE_ESTIMATOR_ON==True:
@@ -169,7 +182,7 @@ class LCSOverPassMiner:
         self.listeningAddresses[addr] = None
 
 
-        # define function to handle events and print to the console
+    # define function to handle events and print to the console
     def handle_event(self,event):
         eventInfo = json.loads(Web3.toJSON(event))
         #print(taskInfo)
@@ -184,6 +197,13 @@ class LCSOverPassMiner:
 
                 op_instance = self.w3.eth.contract(address=contract_address , abi=self.abi)
                 # advise
+                # try get lock
+                lk = lock.acquire('txn.lock')
+                if lk is None:
+                    logging.info("failed to get lock to advise task "+str(eventInfo['args']['taskId'])+traceback.format_exc())
+                    return
+
+
                 transaction = op_instance.functions.advise(eventInfo['args']['taskId'], llcs, [lcs]).buildTransaction({"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.w3.eth.gas_price, "nonce":  self.w3.eth.getTransactionCount(self.my_address), "gas": 3*10**6})
                 signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
                 tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
@@ -191,7 +211,8 @@ class LCSOverPassMiner:
                 logging.info("succeed to advise task "+str(eventInfo['args']['taskId'])+" \n"+str(tx_receipt))
                 # getIncentive
                 self.q.put(str(eventInfo['args']['taskId']))
-    
+                lock.release(lk)
+
             except:
                 logging.info("failed to advise task "+str(eventInfo['args']['taskId'])+traceback.format_exc())
         else:
@@ -209,6 +230,7 @@ class LCSOverPassMiner:
                 self.handle_event(newQuestion)
             time.sleep(poll_interval)
 
+    # listen to postNewQuestion event of contract _addr
     def listen(self, _addr:str):
         
         if _addr not in self.listeningAddresses or self.listeningAddresses[_addr] == None:
@@ -222,12 +244,13 @@ class LCSOverPassMiner:
             except:
                 raise OverPassException("py", traceback.format_exc())
 
+    # unlisten to postNewQuestion event of contract _addr 
     def unlisten(self, _addr:str):
         if _addr in self.listeningAddresses and self.listeningAddresses[_addr]!=None:
             try:
-                self.listeningAddresses[addr].kill()
-                self.listeningAddresses[addr].join()
-                self.listeningAddresses[addr] = None
+                self.listeningAddresses[_addr].kill()
+                self.listeningAddresses[_addr].join()
+                self.listeningAddresses[_addr] = None
                 if not t1.isAlive():
                     print('thread killed')
             except:
@@ -266,6 +289,8 @@ class LCSOverPassMiner:
         return dp[m][n], slcs
 
 
+
+# frank test and optimize
 def overpass_miner_assistant(_my_address:str, _my_private_key:str):
     op_LCS_miner =LCSOverPassMiner(HTTP_PROVIDER,_my_address,_my_private_key)
     while 1:
@@ -288,9 +313,6 @@ def overpass_miner_assistant(_my_address:str, _my_private_key:str):
             op_LCS_miner.minIncentive = int(orders[1])
         elif orders[0] == 'min_incentive':
             op_LCS_miner.maximumDuration = int(orders[1])
-
-
-
 
 
 

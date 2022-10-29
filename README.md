@@ -57,10 +57,10 @@ where 100 means generate 100 accounts 5. use terminal 2 to deploy LCSOverPass on
 python3 demo.py LCSOverPass
 ```
 
-You can enter number of questions to model 6. use terminal 3 to play the role in miner
-
+You can enter number of questions to model
+6. use terminal 3 to play the role in miner and listen to the contract deployed by terminal 2
 ```sh
-python3 python3 deploy.py LCSOverPassMiner and listen to the contract deployed by terminal 2
+python3 python3 deploy.py LCSOverPassMiner 
 ```
 
 7. use terminal 4 to track the log
