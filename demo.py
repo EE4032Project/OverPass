@@ -88,7 +88,7 @@ class LCSOverPass:
             },
             solc_version="0.8.7",
         )
-        with open("./overpass/compiled_code.json", "w") as file:
+        with open("./overpass/lcs_overpass_compiled_code.json", "w") as file:
             json.dump(compiled_sol, file)
         return compiled_sol
     
@@ -212,7 +212,7 @@ class LCS:
             },
             solc_version="0.8.7",
         )
-        with open("./overpass/compiled_code.json", "w") as file:
+        with open("./overpass/lcs_compiled_code.json", "w") as file:
             json.dump(compiled_sol, file)
         return compiled_sol
     
@@ -252,18 +252,19 @@ class LCS:
             raise OverPassException("py", "Contract deployed already")
 
     # delegate a contract
-    def compute_lcs(self, str1:str, str2: str, _incentive: int):
+    def compute_lcs(self, str1:str, str2: str):
         lk = lock.acquire('txn.lock')
         if lk is None:
             raise OverPassException("py", traceback.format_exc())
         transaction = self.overpass_instance.functions.lcs(str1,str2).buildTransaction(
-            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.w3.eth.gas_price, "nonce":  self.w3.eth.getTransactionCount(self.my_address), "gas": 3*10**6, "value":_incentive})
+            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.w3.eth.gas_price, "nonce":  self.w3.eth.getTransactionCount(self.my_address), "gas": 3*10**6})
         signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
         try:
+            tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
             tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
             return tx_receipt
         except:
+            print(traceback.format_exc())
             raise OverPassException("solidity", traceback.format_exc())
         finally:
             lock.release(lk)
@@ -507,10 +508,10 @@ if __name__=="__main__":
             print("LCSOverPass is deployed successfully!\ncontract address: {contract_address}".format(contract_address=receipt['contractAddress']))
         except:
             print(traceback.format_exc())
-        times_to_delegate = input("times_to_delegate:")
-        for i in range(int(times_to_delegate)):
-            print(op_LCS.compute_lcs("he","hex", 10**18))
-            time.sleep(20)
+        times_to_compute = input("times_to_compute:")
+        for i in range(int(times_to_compute)):
+            print(op_LCS.compute_lcs("he","hex"))
+            time.sleep(5)
         print(op_LCS.getTaskApproxGasFee(1))
 
     else:
