@@ -3,14 +3,6 @@
 pragma solidity ^0.8.7;
 
 contract LCS {
-    string[] task;
-    OverPass o;
-    uint256 computePeriod
-
-    constructor (address _contract_addr) {
-        o = OverPass(addr);
-        computePeriod = 
-    }
 
     function lcs(string memory _XS, string memory _YS) public pure returns (uint256){
         bytes memory _X= bytes(_XS);

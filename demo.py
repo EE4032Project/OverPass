@@ -4,6 +4,7 @@ import random
 from solcx import compile_standard, install_solc
 import traceback
 import fcntl
+import web3
 from web3 import Web3, middleware
 from web3.gas_strategies.time_based import medium_gas_price_strategy
 from constant import MIDIUM_GAS_PRICE_ESTIMATOR_ON, HTTP_PROVIDER, STD_LOGGING_ON,FILE_LOGGING_ON
@@ -87,7 +88,7 @@ class LCSOverPass:
             },
             solc_version="0.8.7",
         )
-        with open("./overpass/compiled_code.json", "w") as file:
+        with open("./overpass/lcs_overpass_compiled_code.json", "w") as file:
             json.dump(compiled_sol, file)
         return compiled_sol
     
@@ -152,6 +153,129 @@ class LCSOverPass:
         return self.overpass_instance.functions.checkAns(taskId).call()
 
 
+# An LCSWrapper for user to easily deploy and calculate LCS
+class LCS:
+    contract_address = ""
+    nonce = 0
+
+    def __init__(self,_http_provider:str, _my_address:str, _private_key:str, _contract_address=""):
+
+        self.private_key = _private_key
+        self.my_address = _my_address
+        self.contract_address = _contract_address
+        self.overpass_instance = None
+        self.http_provider = _http_provider
+
+
+
+        # Compile the solidity
+
+        compiled_sol = self.compileLCS()
+
+
+
+        # get bytecode version
+        self.bytecode = compiled_sol["contracts"]["./LCS.sol"]["LCS"]["evm"]["bytecode"]["object"]
+
+        # get abi
+        self.abi = compiled_sol["contracts"]["./LCS.sol"]["LCS"]["abi"]
+
+        # connect to ganache
+
+        self.w3 = Web3(Web3.HTTPProvider(self.http_provider))
+
+        self.chain_id = self.w3.eth.chain_id
+        # open to use medium gas price estimation
+        if MIDIUM_GAS_PRICE_ESTIMATOR_ON==True:
+            self.w3.eth.set_gas_price_strategy(medium_gas_price_strategy)
+        self.w3.middleware_onion.add(middleware.time_based_cache_middleware)
+        self.w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
+        self.w3.middleware_onion.add(middleware.simple_cache_middleware)
+
+    @staticmethod
+    # Compile LCSOverPass code
+    def compileLCS():
+        with open("./overpass/contracts/LCS.sol", "r") as file:
+            LCS = file.read()
+        with open("./overpass/contracts/overpass.sol", "r") as file:
+            overpass = file.read()
+        install_solc("0.8.7")
+        compiled_sol = compile_standard({
+                "language": "Solidity",
+                # sources should be added here if other .sol is imported
+                "sources": {"./LCS.sol": {"content": LCS}},
+                "settings": {
+                    "outputSelection": {
+                        "*": {"*": ["abi", "metadata", "evm.bytecode", "evm.sourceMap"]}
+                    }
+                },
+            },
+            solc_version="0.8.7",
+        )
+        with open("./overpass/lcs_compiled_code.json", "w") as file:
+            json.dump(compiled_sol, file)
+        return compiled_sol
+    
+    # set contract address for a Contracts
+    def setAddress(self, _contract_address: str, _abi:str):
+        self.contract_address = _contract_address
+        self.abi = _abi
+        try:
+            self.overpass_instance  = web3.eth.contract(address=self.contract_address, abi=_abi)
+        except:
+            raise OverPassException("py", traceback.format_exc())
+
+    # depoy contract
+    def deploy(self):
+        if self.overpass_instance == None:
+            # 1.  Build a transaction
+            overpassContract = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
+            lk = lock.acquire('txn.lock')
+            if lk is None:
+                raise OverPassException("py", traceback.format_exc())
+            transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": self.w3.eth.gas_price, "from": self.my_address, "nonce": self.w3.eth.getTransactionCount(self.my_address)})
+            # 2. Sign a transaction
+            signed_txn = self.w3.eth.account.sign_transaction( transaction, private_key=self.private_key)
+            # 3. Send a transaction
+            tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+            try:
+                contract_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+                self.overpass_instance = self.w3.eth.contract( address=contract_receipt.contractAddress, abi=self.abi)
+                self.contract_address = contract_receipt.contractAddress
+                return contract_receipt
+
+            except:
+                raise OverPassException("sol", traceback.format_exc())
+            finally:
+                lock.release(lk)
+        else:
+            raise OverPassException("py", "Contract deployed already")
+
+    # Compute LCS contract
+    def compute_lcs(self, str1:str, str2: str):
+        lk = lock.acquire('txn.lock')
+        if lk is None:
+            raise OverPassException("py", traceback.format_exc())
+        transaction = self.overpass_instance.functions.lcs(str1,str2).buildTransaction(
+            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.w3.eth.gas_price, "nonce":  self.w3.eth.getTransactionCount(self.my_address), "gas": 3*10**6})
+        signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
+        try:
+            tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+            tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+            return tx_receipt
+        except:
+            print(traceback.format_exc())
+            raise OverPassException("solidity", traceback.format_exc())
+        finally:
+            lock.release(lk)
+
+
+    # As there is no function of getTaskApproxFee and checkAns function in LCS.sol, this doesn't need to be included
+    # def getTaskApproxGasFee(self,taskId:int):
+    #     return self.overpass_instance.functions.getTaskApproxGasFee(taskId).call()
+
+    # def checkAns(self,taskId:int):
+    #     return self.overpass_instance.functions.checkAns(taskId).call()
 
 
 
@@ -361,9 +485,10 @@ if __name__=="__main__":
             print(traceback.format_exc())
         times_to_delegate = input("times_to_delegate:")
         for i in range(int(times_to_delegate)):
-            print(op_LCS.delegate_compute("jshdikalk","jdhsifnsd", 10**18))
+            response = op_LCS.delegate_compute("jshdikalk","jdhsifnsd",10**18)
+            print("Gas used: ",vars(response)['gasUsed'])
             time.sleep(20)
-        print(op_LCS.getTaskApproxGasFee(1))
+        print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
     elif len(sys.argv)>1 and sys.argv[1]== "LCSOverPassMiner":
         my_address = addresses[1]
@@ -372,11 +497,30 @@ if __name__=="__main__":
         
         overpass_miner_assistant(my_address, my_private_key)
 
+    elif len(sys.argv)>1 and sys.argv[1]== "LCS":
+        my_address = addresses[2]
+        my_private_key = keys_dict["private_keys"][my_address]
+        my_address = Web3.toChecksumAddress(my_address)
 
+        op_LCS = LCS(HTTP_PROVIDER,my_address,my_private_key)
 
+        try:
+            receipt = op_LCS.deploy()
+            print("LCS is deployed successfully!\ncontract address: {contract_address}".format(contract_address=receipt['contractAddress']))
+        except:
+            print(traceback.format_exc())
+        times_to_compute = input("times_to_compute:")
+        for i in range(int(times_to_compute)):
+            response = op_LCS.compute_lcs("he","hex")
+            print("Gas used: ",vars(response)['gasUsed'])
+            # print(response)
+            time.sleep(5)
+        print("Cumulative Gas Used: ", int(vars(response)['gasUsed']) * int(times_to_compute))
+        # There is no getTaskApproxGasFee function in LCS.sol
+        # print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
     else:
-        print("Legal Role:\n  1. 'LCSOverPass'\n  2. 'miner'\n")
+        print("Legal Role:\n  1. 'LCSOverPass'\n  2. 'miner'\n  3. 'LCS'\n")
 
 
 #print(file)
