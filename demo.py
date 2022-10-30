@@ -203,7 +203,7 @@ class LCS:
         compiled_sol = compile_standard({
                 "language": "Solidity",
                 # sources should be added here if other .sol is imported
-                "sources": {"./LCS.sol": {"content": LCS}, "./overpass.sol":{"content": overpass}},
+                "sources": {"./LCS.sol": {"content": LCS}},
                 "settings": {
                     "outputSelection": {
                         "*": {"*": ["abi", "metadata", "evm.bytecode", "evm.sourceMap"]}
@@ -251,7 +251,7 @@ class LCS:
         else:
             raise OverPassException("py", "Contract deployed already")
 
-    # delegate a contract
+    # Compute LCS contract
     def compute_lcs(self, str1:str, str2: str):
         lk = lock.acquire('txn.lock')
         if lk is None:
@@ -270,12 +270,12 @@ class LCS:
             lock.release(lk)
 
 
+    # As there is no function of getTaskApproxFee and checkAns function in LCS.sol, this doesn't need to be included
+    # def getTaskApproxGasFee(self,taskId:int):
+    #     return self.overpass_instance.functions.getTaskApproxGasFee(taskId).call()
 
-    def getTaskApproxGasFee(self,taskId:int):
-        return self.overpass_instance.functions.getTaskApproxGasFee(taskId).call()
-
-    def checkAns(self,taskId:int):
-        return self.overpass_instance.functions.checkAns(taskId).call()
+    # def checkAns(self,taskId:int):
+    #     return self.overpass_instance.functions.checkAns(taskId).call()
 
 
 
@@ -485,9 +485,10 @@ if __name__=="__main__":
             print(traceback.format_exc())
         times_to_delegate = input("times_to_delegate:")
         for i in range(int(times_to_delegate)):
-            print(op_LCS.delegate_compute("jshdikalk","jdhsifnsd"))
+            response = op_LCS.delegate_compute("jshdikalk","jdhsifnsd",10**18)
+            print("Gas used: ",vars(response)['gasUsed'])
             time.sleep(20)
-        print(op_LCS.getTaskApproxGasFee(1))
+        print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
     elif len(sys.argv)>1 and sys.argv[1]== "LCSOverPassMiner":
         my_address = addresses[1]
@@ -505,17 +506,21 @@ if __name__=="__main__":
 
         try:
             receipt = op_LCS.deploy()
-            print("LCSOverPass is deployed successfully!\ncontract address: {contract_address}".format(contract_address=receipt['contractAddress']))
+            print("LCS is deployed successfully!\ncontract address: {contract_address}".format(contract_address=receipt['contractAddress']))
         except:
             print(traceback.format_exc())
         times_to_compute = input("times_to_compute:")
         for i in range(int(times_to_compute)):
-            print(op_LCS.compute_lcs("he","hex"))
+            response = op_LCS.compute_lcs("he","hex")
+            print("Gas used: ",vars(response)['gasUsed'])
+            # print(response)
             time.sleep(5)
-        print(op_LCS.getTaskApproxGasFee(1))
+        print("Cumulative Gas Used: ", int(vars(response)['gasUsed']) * int(times_to_compute))
+        # There is no getTaskApproxGasFee function in LCS.sol
+        # print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
     else:
-        print("Legal Role:\n  1. 'LCSOverPass'\n  2. 'miner'\n")
+        print("Legal Role:\n  1. 'LCSOverPass'\n  2. 'miner'\n  3. 'LCS'\n")
 
 
 #print(file)
