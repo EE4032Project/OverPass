@@ -1,4 +1,4 @@
-# EE4032 (Project title)
+# OverPass (Course Project in EE4032)
 
 ## Table of Contents
 
