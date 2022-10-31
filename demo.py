@@ -14,10 +14,7 @@ import logging
 import queue
 from utils import thread_with_trace, lock
 import os
-
-
-
-
+import testcase
 
 class OverPassException(Exception):
     def __init__(self, _type="py",_message="OverPassError"):
@@ -407,8 +404,10 @@ class LCSOverPassMiner:
                 raise OverPassException("py", traceback.format_exc())
 
     def get_incentive(self):
+        cnt = 0
         while not self.q.empty():
             task = q.get(block=False)
+            
             try:
                 lk = lock.acquire('txn.lock')
                 self.updateNonce()
@@ -425,7 +424,9 @@ class LCSOverPassMiner:
                 q.put(task)
                 logging.info("failed to get incentive of  task "+contract_address+":"+str(taskId)+" \n"+str(tx_receipt))
                 lock.release(lk)
-
+            
+            cnt += 1
+        return cnt
 
 
 
@@ -482,10 +483,11 @@ def overpass_miner_assistant(_my_address:str, _my_private_key:str):
                 print(traceback.format_exc())
         elif orders[0] == 'min_incentive':
             op_LCS_miner.minIncentive = int(orders[1])
-        elif orders[0] == 'min_incentive':
+        elif orders[0] == 'max_duration':
             op_LCS_miner.maximumDuration = int(orders[1])
         elif orders[0] == 'get_incentive':
-            op_LCS_miner.get_incentive()
+            cnt = op_LCS_miner.get_incentive()
+            print(f"obtained incentive from {cnt} tasks")
         else:
             print("illegal ordering")
 
@@ -523,7 +525,6 @@ if __name__=="__main__":
     addresses = list(keys_dict["private_keys"].keys())
 
 
-
     if len(sys.argv)>1 and sys.argv[1].strip()== "LCSOverPass":
         my_address = addresses[0]
         my_private_key = keys_dict["private_keys"][my_address]
@@ -537,10 +538,15 @@ if __name__=="__main__":
         except:
             print(traceback.format_exc())
         times_to_delegate = input("times_to_delegate:")
+        gas_sum = 0
         for i in range(int(times_to_delegate)):
-            response = op_LCS.delegate_compute("jshdikalk","jdhsifnsd",10**18)
+
+            test_case = testcase.get_testcase(i)
+            response = op_LCS.delegate_compute(test_case[0],test_case[10], 10**18)
             print("Gas used: ",vars(response)['gasUsed'])
+            gas_sum += vars(response)['gasUsed']
             #time.sleep(20)
+        print(f"Average Overpass Gas Fee for {times_to_delegate} testcases is: {gas_sum/times_to_delegate}")
         print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
     elif len(sys.argv)>1 and sys.argv[1].strip()== "miner":
@@ -563,11 +569,17 @@ if __name__=="__main__":
         except:
             print(traceback.format_exc())
         times_to_compute = input("times_to_compute:")
+        gas_sum = 0
         for i in range(int(times_to_compute)):
-            response = op_LCS.compute_lcs("he","hex")
+            test_case = testcase.get_testcase(i)
+
+            response = op_LCS.compute_lcs(test_case[0],test_case[1])
             print("Gas used: ",vars(response)['gasUsed'])
+            gas_sum += vars(response)['gasUsed']
             # print(response)
             #time.sleep(20)
+        print(f"Average LCS (non-overpass) Gas Fee for {times_to_compute} testcases is: {gas_sum/times_to_compute}")
+
         print("Cumulative Gas Used: ", int(vars(response)['gasUsed']) * int(times_to_compute))
         # There is no getTaskApproxGasFee function in LCS.sol
         # print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
