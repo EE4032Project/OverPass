@@ -68,8 +68,8 @@ class LCSOverPass:
         self.w3.middleware_onion.add(middleware.time_based_cache_middleware)
         self.w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
         self.w3.middleware_onion.add(middleware.simple_cache_middleware)
-        self.nonce = 1
-        self.blocknumber =0
+        self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
+        self.blocknumber = -1
         self.feePerGas = None 
 
     def estimateGasPrice(self):
@@ -86,12 +86,14 @@ class LCSOverPass:
         # the unit is GWei
 
     def updateNonce(self):
-        block = self.w3.eth.get_block('latest')
-        if self.blocknumber == block['number']:
-            self.nonce += 1
-        else:
-            self.blocknumber = block['number']
-            self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        # block = self.w3.eth.get_block('latest')
+        # if self.blocknumber == block['number']:
+        #     self.nonce += 1
+        # else:
+        #     self.blocknumber = block['number']
+        #     self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        self.nonce += 1
+        
         
 
     @staticmethod
@@ -220,8 +222,7 @@ class LCS:
         self.w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
         self.w3.middleware_onion.add(middleware.simple_cache_middleware)
 
-        self.nonce = 1
-        self.blocknumber =0
+        self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
 
         self.feePerGas = None 
 
@@ -265,12 +266,13 @@ class LCS:
 
 
     def updateNonce(self):
-        block = self.w3.eth.get_block('latest')
-        if self.blocknumber == block['number']:
-            self.nonce += 1
-        else:
-            self.blocknumber = block['number']
-            self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        # block = self.w3.eth.get_block('latest')
+        # if self.blocknumber == block['number']:
+        #     self.nonce += 1
+        # else:
+        #     self.blocknumber = block['number']
+        #     self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        self.nonce += 1
         
     
     # set contract address for a Contracts
@@ -358,7 +360,7 @@ class LCSOverPassMiner:
         self.maximumDuration = 5
         self.listeningAddresses = {}
         self.q = queue.Queue()
-        self.nonce = 1
+        self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
         self.blocknumber =0
         self.feePerGas = None 
 
@@ -383,12 +385,13 @@ class LCSOverPassMiner:
 
     
     def updateNonce(self):
-        block = self.w3.eth.get_block('latest')
-        if self.blocknumber == block['number']:
-            self.nonce += 1
-        else:
-            self.blocknumber = block['number']
-            self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        # block = self.w3.eth.get_block('latest')
+        # if self.blocknumber == block['number']:
+        #     self.nonce += 1
+        # else:
+        #     self.blocknumber = block['number']
+        #     self.nonce = self.w3.eth.getTransactionCount(self.my_address)
+        self.nonce += 1
         
 
 
@@ -605,7 +608,7 @@ if __name__=="__main__":
         for i in range(int(times_to_delegate)):
             response = op_LCS.delegate_compute("jshdikalk","jdhsifnsd",10**18)
             print("Gas used: ",vars(response)['gasUsed'])
-            #time.sleep(20)
+            # time.sleep(1)
             print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
     elif len(sys.argv)>1 and sys.argv[1].strip()== "miner":
