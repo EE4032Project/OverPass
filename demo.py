@@ -542,7 +542,7 @@ if __name__=="__main__":
         for i in range(int(times_to_delegate)):
 
             test_case = testcase.get_testcase(i)
-            response = op_LCS.delegate_compute(test_case[0],test_case[10], 10**18)
+            response = op_LCS.delegate_compute(test_case[0],test_case[1], 10**18)
             print("Gas used: ",vars(response)['gasUsed'])
             gas_sum += vars(response)['gasUsed']
             #time.sleep(20)
