@@ -148,6 +148,11 @@ On `Terminal 1`, you should see the following.
 
 <img width="623" alt="Screenshot 2022-10-31 at 12 43 32 PM" src="https://user-images.githubusercontent.com/88195289/198932724-cd448ee9-5b12-4bf4-a485-7bcdce10deb4.png">
 
+On `Terminal 2`, you should see the following
+
+<img width="826" alt="Screenshot 2022-10-31 at 1 51 02 PM" src="https://user-images.githubusercontent.com/88195289/198944446-140ada77-af0d-4776-bf0d-06705c3c7397.png">
+
+
 ## Section 4: Remarks<a name="section-4-remarks"></a>
 
 ### Section 4.1. Installing Python3 Environment
