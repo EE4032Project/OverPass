@@ -37,6 +37,7 @@ The theory of computation is shaped by the Interactive Proof (IP) system [\[Gold
 | :---------------: | :---: |:---: |
 |  use OverPass| (Answer_incentive - gas_verify, incentive - gas_verify)  | (0, - gas_verify)|
 |   not user OverPass   | (Answer_incentive - gas_search, 0)  | (Answer_incentive - gas_search, 0) |
+
 Given that gas for searching is much higher than gas for verifier, and a wide incentive is set by the client, the client use OverPass and Advisor be honest, is the Nash Equilibrium. Note that the mechanism would work under the assumption that the client is a rationale and at least one advisor is rationale and selfish, which is very robust.
 
 This project introduces a standard for OverPass, see `overpass.sol` and also implements a demo project for the Longest Common Subsequence Problem(LCS) for two strings, which has O(mn) search algorithm and O(m+n) verification algorithm, where m and n are the lengths of the two strings respectively.
