@@ -489,7 +489,7 @@ def overpass_miner_assistant(_my_address:str, _my_private_key:str):
             cnt = op_LCS_miner.get_incentive()
             print(f"obtained incentive from {cnt} tasks")
         else:
-            print("illegal ordering")
+            print("illegal order")
 
 
 
