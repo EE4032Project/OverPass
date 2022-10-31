@@ -17,21 +17,40 @@ Smart contracts provide trust computing. Once a smart contract has been engaged,
   - pass verification: provide the outputs to customers & give incentives to local computers
   - otherwise: reject
 
-Our project can optimize smart contracts based on the functions below.
+Our project can optimize smart contracts by providing cheaper gas consumption for complex computation problemS combining the pros of both EVM and un-trusted computational power as shown below
 
-|     Function      | Cons  |
-| :---------------: | :---: |
-| local conputation | fast  |
-|   verification    | cheap |
+|     Function      | Pros |Cons  | 
+| :---------------: | :---: |:---: |
+| local conputation | fast and cheap  | un-trusted|
+|   smart contract    | trusted  | slow |
 
-## Section 2: Prerequisites <a name="#section-2-prerequisites"></a>
+An overview of overpass is as follows:
+
+![Sequence Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/EE4032Project/OverPass/main/image/overpass_overview.puml)
+
+Un-trusted miners provide computation power to overpass and the correctness of execution is guaranteed by the verification algorithm on overpass(smart contract). Detailed theoretical background would be introduced in section 2.
+
+## Section 2: 
+Theory of computation is shaped by Interactive Proof (IP) system [\[Goldwasser, Micali & Rockoff, 1989\]](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf), where a strong, possibly malicious, prover interact with a weak verifier, and at the end of the computation, client can output answer achiving [completeness](https://en.wikipedia.org/wiki/Completeness_(cryptography)) and [soundness](https://en.wikipedia.org/wiki/Zero-knowledge_proof#:~:text=Completeness%3A%20if%20the%20statement%20is,except%20with%20some%20small%20probability.). It's proved that [IP=PSPACE](https://en.wikipedia.org/wiki/IP_(complexity)) and hence programs run on Turing machine generally have an polynomial interactive proof scheme. There is sign that many problem has cheaper verification algorithm than search algorithm(e.g. NP-complete, sorting). This triggerred a novel idea on trust-worthy computation that not all work should be done on the trusted slow "computer", or verifier, as long as the un-trusted computational power can provid a proof for the answer to the verifier. This would expand the computational power of consented computer (e.g. EVM) trimentically while the trustness of the computation is maintained. A incentive mechanism is made such that miners have incentive to mine by executing the protocol honestly and verifier has incentive to participate and save gas fee to achieve the same goal. An example of the incentive mechanism is as follows:
+
+|    client \  advisor   | Honest |Cheat  | 
+| :---------------: | :---: |:---: |
+|  use OverPass| (Answer_incentive - gas_verify, incentive - gas_verify)  | (0, - gas_verify)|
+|   not user OverPass   | (Answer_incentive - gas_search, 0)  | (Answer_incentive - gas_search, 0) |
+Given that gas for searching is much higher than gas for verifier, and a wide incentive is set by the client, client use OverPass and Advisor be honest is the Nash Equilibrium. Note that the mechanism would work under the assumption that the client is rationale and at leadt one advisor is rationale and selfish, which is very robust.
+
+This project introduce a standard for overpass, see `overpass.sol` and also implement a demo project for Longest Common Subsequence Problem(LCS) for two strings, which has O(mn) search algorithm and O(m+n) verification algorithm, where m and n are the length of the two strings respectively.
+
+
+
+## Section 3: Prerequisites <a name="#section-2-prerequisites"></a>
 
 1. Homebrew (Mac Users only)
 2. Python 3 environment
 3. Node 16
 4. Ganache CLI
 
-## Section 3: How to interact <a name="#section-3-how-to-interact"></a>
+## Section 4: How to interact <a name="#section-3-how-to-interact"></a>
 
 1. Clone the github repository and enter into the directory.
 
@@ -153,9 +172,9 @@ On `Terminal 2`, you should see the following
 <img width="826" alt="Screenshot 2022-10-31 at 1 51 02 PM" src="https://user-images.githubusercontent.com/88195289/198944446-140ada77-af0d-4776-bf0d-06705c3c7397.png">
 
 
-## Section 4: Remarks<a name="section-4-remarks"></a>
+## Section 5: Remarks<a name="section-4-remarks"></a>
 
-### Section 4.1. Installing Python3 Environment
+### Section 5.1. Installing Python3 Environment
 
 If you do not have a Python3 environment, we recommend installing anaconda using the following command.
 
@@ -163,13 +182,13 @@ If you do not have a Python3 environment, we recommend installing anaconda using
 brew install --cask anaconda # Mac Environment: Installed using homebrew
 ```
 
-### Section 4.2. Installing Node16
+### Section 5.2. Installing Node16
 
 ```sh
 brew install node # Mac Environment: Installed using homebrew
 ```
 
-### Section 4.3. Installing Virtual Environment
+### Section 5.3. Installing Virtual Environment
 
 ```sh
 
