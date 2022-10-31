@@ -54,26 +54,43 @@ pip3 install -r requirements.txt
 
 #### Terminal 1:
 
+Start up the ganachetest net. You may specify the number of accounts that you
+would like to generate which, for our case, is 100.
+
 ```sh
 
 cd testnet # Enter the testnet directory
+sh start_gananche_testnet.sh 100 # Start up the ganache test net
 
 
 ```
 
-use terminal 1 and enter `$OVER_PASS/testnet`
+#### Terminal 2
+
+Deploy the LCSOverPass on Truffle network
+
+```sh
+$ python3 demo.py LCSOverPass
+
+```
+
+You should see the following after you have executed the command successfully.
 
 ```sh
 
-sh start_gananche_testnet.sh 100
+contract address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
+times_to_delegate: 3
+
 ```
 
-where 100 means generate 100 accounts 5. use terminal 2 to deploy LCSOverPass on Truffle network
+Specify the number of questions that you would like to model, which for our case is 3.
+After you press enter, you should see something like this.
 
-```sh
-python3 demo.py LCSOverPass
 ```
 
+```
+
+### Terminal 4
 You can enter number of questions to model 6. use terminal 3 to play the role in miner and listen to the contract deployed by terminal 2
 
 ```sh
