@@ -420,12 +420,13 @@ class LCSOverPassMiner:
                 tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
                 logging.info("succeed to get incentive of  task "+contract_address+":"+str(taskId)+" \n"+str(tx_receipt))
                 lock.release(lk)
+                cnt += 1
             except:
                 q.put(task)
                 logging.info("failed to get incentive of  task "+contract_address+":"+str(taskId)+" \n"+str(tx_receipt))
                 lock.release(lk)
             
-            cnt += 1
+            
         return cnt
 
 
