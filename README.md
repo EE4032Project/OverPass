@@ -5,6 +5,7 @@
 1. [Introduction](#section-1-introduction)
 2. [Prerequisites](#section-2-prerequisites)
 3. [How to interact](#section-3-how-to-interact)
+4. [Remarks](#section-4-remarks)
 
 ## Section 1: Introduction <a name="section-1-introduction"></a>
 
@@ -114,7 +115,7 @@ To log down the information, execute the following command on terminal 4.
 tail -f logs.log
 ```
 
-## Section 4: Remarks
+## Section 4: Remarks<a name="section-4-remarks"></a>
 
 ### Section 4.1. Installing Python3 Environment
 
