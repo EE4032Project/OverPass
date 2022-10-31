@@ -6,10 +6,10 @@
 2. [Theoretical background](#section-2-Theoretical-background)
 3. [Prerequisites](#section-3-prerequisites)
 4. [How to interact](#section-4-how-to-interact)
-5. [Remarks](#section-5-remarks)
-    5.1 [Installing Python3 Environment](#section-5.1-phython-environment)
-    5.2 [Installing Node16](#section-5.2-node16)
-    5.3. [Installing Virtual Environment](#section-5.3-virtual-environment)
+5. [Remarks](#section-5-remarks) <br>
+   5.1 [Installing Python3 Environment](#section-5.1-phython-environment) <br>
+   5.2 [Installing Node16](#section-5.2-node16) <br>
+   5.3. [Installing Virtual Environment](#section-5.3-virtual-environment) <br>
 6. [Acknowledgement](#section-6-acknowledgement)
 
 ## Section 1: Introduction <a name="section-1-introduction"></a>
@@ -24,10 +24,10 @@ Smart contracts provide trust computing. Once a smart contract has been engaged,
 
 Our project can optimize smart contracts by providing cheaper gas consumption for complex computation problemS combining the pros of both EVM and un-trusted computational power as shown below:
 
-|     Function      | Pros |Cons  | 
-| :---------------: | :---: |:---: |
-| local conputation | fast and cheap  | un-trusted|
-|   smart contract    | trusted  | slow |
+|     Function      |      Pros      |    Cons    |
+| :---------------: | :------------: | :--------: |
+| local conputation | fast and cheap | un-trusted |
+|  smart contract   |    trusted     |    slow    |
 
 An overview of the overpass is as follows:
 
@@ -36,43 +36,44 @@ An overview of the overpass is as follows:
 Un-trusted miners provide computation power to OverPass and the correctness of execution is guaranteed by the verification algorithm on OverPass(smart contract). The detailed theoretical background would be introduced in section 2.
 
 ## Section 2: Theoretical background <a name="section-1-Theoretical-background"></a>
-The theory of computation is shaped by the Interactive Proof (IP) system [\[Goldwasser, Micali & Rockoff, 1989\]](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf), where a strong, possibly malicious, prover interact with a weak verifier, and at the end of the computation, the client can output answer achiving [completeness](https://en.wikipedia.org/wiki/Completeness_(cryptography)) and [soundness](https://en.wikipedia.org/wiki/Zero-knowledge_proof#:~:text=Completeness%3A%20if%20the%20statement%20is,except%20with%20some%20small%20probability.). It's proved that [IP=PSPACE](https://en.wikipedia.org/wiki/IP_(complexity)) and hence programs run on Turing machine generally have a polynomial interactive proof scheme. There are signs that many problems has cheaper verification algorithm than search algorithm(e.g., NP-complete, sorting). This triggered a novel idea on trust-worthy computation that not all work should be done on the trusted slow "computer", or verifier, as long as the un-trusted computational power can provide proof for the answer to the verifier. This would expand the computational power of consented computers (e.g. EVM) tremendously while the trust of the computation is maintained. An incentive mechanism is made such that miners have the incentive to mine by executing the protocol honestly and the verifier has the incentive to participate and save gas fees from achieving the same goal. An example of the incentive mechanism is as follows:
 
-|    client \  advisor   | Honest |Cheat  | 
-| :---------------: | :---: |:---: |
-|  use OverPass| (Answer_incentive - gas_verify, incentive - gas_verify)  | (0, - gas_verify)|
-|   not user OverPass   | (Answer_incentive - gas_search, 0)  | (Answer_incentive - gas_search, 0) |
+The theory of computation is shaped by the Interactive Proof (IP) system [\[Goldwasser, Micali & Rockoff, 1989\]](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf), where a strong, possibly malicious, prover interact with a weak verifier, and at the end of the computation, the client can output answer achiving [completeness](<https://en.wikipedia.org/wiki/Completeness_(cryptography)>) and [soundness](https://en.wikipedia.org/wiki/Zero-knowledge_proof#:~:text=Completeness%3A%20if%20the%20statement%20is,except%20with%20some%20small%20probability.). It's proved that [IP=PSPACE](<https://en.wikipedia.org/wiki/IP_(complexity)>) and hence programs run on Turing machine generally have a polynomial interactive proof scheme. There are signs that many problems has cheaper verification algorithm than search algorithm(e.g., NP-complete, sorting). This triggered a novel idea on trust-worthy computation that not all work should be done on the trusted slow "computer", or verifier, as long as the un-trusted computational power can provide proof for the answer to the verifier. This would expand the computational power of consented computers (e.g. EVM) tremendously while the trust of the computation is maintained. An incentive mechanism is made such that miners have the incentive to mine by executing the protocol honestly and the verifier has the incentive to participate and save gas fees from achieving the same goal. An example of the incentive mechanism is as follows:
+
+| client \ advisor  |                         Honest                          |               Cheat                |
+| :---------------: | :-----------------------------------------------------: | :--------------------------------: |
+|   use OverPass    | (Answer_incentive - gas_verify, incentive - gas_verify) |         (0, - gas_verify)          |
+| not user OverPass |           (Answer_incentive - gas_search, 0)            | (Answer_incentive - gas_search, 0) |
 
 Given that gas for searching is much higher than gas for verifier, and a wide incentive is set by the client, the client use OverPass and Advisor be honest, is the Nash Equilibrium. Note that the mechanism would work under the assumption that the client is a rationale and at least one advisor is rationale and selfish, which is very robust.
 
 This project introduces a standard for OverPass, see `overpass.sol` and also implements a demo project for the Longest Common Subsequence Problem(LCS) for two strings, which has O(mn) search algorithm and O(m+n) verification algorithm, where m and n are the lengths of the two strings respectively.
 
-
-
 ## Section 3: Prerequisites <a name="#section-2-prerequisites"></a>
+
 ### Mac Users:
+
 1. Homebrew (Mac Users only)
 2. Python 3 environment
 3. Node 16
 4. Ganache CLI
 
 ### Windows Users:
-1. WSL and Ubuntu. 
-Download WSL and Ubuntu by using the following site: https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview. 
-Note that we recommend Ubuntu 20.04 LTS for the Ubuntu Version and it is suffiecient to follow until steps 4.
-2. Latest version of Node Version Manager (nvm) and pick Node 16. 
-Download nvm by using the following site: https://blog.devsharma.live/setting-up-nodejs-with-nvm-on-wsl-2
-After installing nvm, you can type the following command to install Node 16 and its relevant npm
+
+1. WSL and Ubuntu.
+   Download WSL and Ubuntu by using the following site: https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview.
+   Note that we recommend Ubuntu 20.04 LTS for the Ubuntu Version and it is suffiecient to follow until steps 4.
+2. Latest version of Node Version Manager (nvm) and pick Node 16.
+   Download nvm by using the following site: https://blog.devsharma.live/setting-up-nodejs-with-nvm-on-wsl-2
+   After installing nvm, you can type the following command to install Node 16 and its relevant npm
+
 ```sh
 nvm install 16
 nvm use <node version>
 ```
+
 3. Python 3 (Should be installed automatically for Ubuntu. We can check by typing: python3 --version)
 4. Ganache CLI (See [Remarks](#section-4-remarks))
 5. For opening new terminals, tap the windows menu, type ubuntu and enter
-
-
-
 
 ## Section 4: How to interact <a name="#section-4-how-to-interact"></a>
 
@@ -153,6 +154,7 @@ Available orders:
 2. unlisten <contract_address>
 3. min_incentive <min_incentive>
 4. maximum_duration <maximum_duration>
+5. get_incentive
 
 ```
 
@@ -194,7 +196,6 @@ On `Terminal 1`, you should see the following.
 On `Terminal 2`, you should see the following
 
 <img width="826" alt="Screenshot 2022-10-31 at 1 51 02 PM" src="https://user-images.githubusercontent.com/88195289/198944446-140ada77-af0d-4776-bf0d-06705c3c7397.png">
-
 
 ## Section 5: Remarks<a name="section-4-remarks"></a>
 
