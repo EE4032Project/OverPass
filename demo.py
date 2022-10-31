@@ -218,7 +218,7 @@ class LCS:
 
 
     def updateNonce(self):
-        block = w3.eth.get_block('latest')
+        block = self.w3.eth.get_block('latest')
         if self.blocknumber == block['number']:
             self.nonce += 1
         else:
