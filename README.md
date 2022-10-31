@@ -53,15 +53,13 @@ pip3 install -r requirements.txt
 
 4. Open up 4 terminals.
 
-### Terminal 1:
-
-Start up the ganachetest net. You may specify the number of accounts that you
-would like to generate which, for our case, is 100.
+5. On `Terminal 1`, start up the ganachetest net. You may specify the number of accounts that you
+   would like to generate which, for our case, is 100.
 
 ```sh
 
-cd testnet # Enter the testnet directory
-sh start_gananche_testnet.sh 100 # Start up the ganache test net
+$ cd testnet # Enter the testnet directory
+$ sh start_gananche_testnet.sh 100 # Start up the ganache test net
 
 
 ```
@@ -70,9 +68,15 @@ Upon successful set up, you should see the following
 
 <img width="752" alt="Screenshot 2022-10-31 at 12 44 18 PM" src="https://user-images.githubusercontent.com/88195289/198932873-3322aa4c-c60e-418b-92f0-5bd38d89884e.png">
 
-### Terminal 2
+6. On `Terminal 2`, to log down the information, execute the following command.
 
-Deploy the LCSOverPass on Truffle network
+```sh
+
+$ tail -f logs.log
+
+```
+
+7. On `Terminal 3`, deploy the LCSOverPass on Truffle network
 
 ```sh
 $ python3 demo.py LCSOverPass
@@ -84,36 +88,65 @@ You should see the following after you have executed the command successfully.
 ```sh
 
 contract address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
+times_to_delegate:
+
+```
+
+8. On `Terminal 4`, we can play the role of a miner and listen to the
+   contracct deployed on `Terminal 2` using the following command.
+
+```sh
+
+$ python3 demo.py LCSOverPassMiner
+
+```
+
+You should see the following:
+
+```sh
+
+Available orders:
+1. listen <contract_address>
+2. unlisten <contract_address>
+3. min_incentive <min_incentive>
+4. maximum_duration <maximum_duration>
+
+```
+
+We can set the configurations, such as listening to the
+contract address using the following
+
+```sh
+
+Order: listen 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab # The address is from Terminal 3
+
+```
+
+After this, we should see the following:
+
+```sh
+
+Start listening on address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
+
+```
+
+9. Specify the number of questions that you would like to model on `Terminal 3`,
+   which for our case is 1.
+
+```sh
+
+contract address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
 times_to_delegate: 1
 
 ```
 
-Specify the number of questions that you would like to model, which for our case is 1.
-After you press enter, you should see something like this on terminal 2.
+After you press enter, you should see something like this on `Terminal 3`.
 
 <img width="814" alt="Screenshot 2022-10-31 at 12 40 25 PM" src="https://user-images.githubusercontent.com/88195289/198932572-a0f523c3-e85b-4d21-bd4f-5bd911e2c806.png">
 
-On terminal 1, you should see the following.
+On `Terminal 1`, you should see the following.
 
 <img width="623" alt="Screenshot 2022-10-31 at 12 43 32 PM" src="https://user-images.githubusercontent.com/88195289/198932724-cd448ee9-5b12-4bf4-a485-7bcdce10deb4.png">
-
-### Terminal 3
-
-To play the role of the miner and listen to the contract deployed by terminal 2, execute the following command.
-
-```sh
-
-python3 demo.py LCSOverPassMiner
-
-```
-
-### Terminal 4
-
-To log down the information, execute the following command on terminal 4.
-
-```sh
-tail -f logs.log
-```
 
 ## Section 4: Remarks<a name="section-4-remarks"></a>
 
