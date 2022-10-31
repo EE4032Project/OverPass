@@ -97,13 +97,19 @@ On terminal 1, you should see the following.
 <img width="623" alt="Screenshot 2022-10-31 at 12 43 32 PM" src="https://user-images.githubusercontent.com/88195289/198932724-cd448ee9-5b12-4bf4-a485-7bcdce10deb4.png">
 
 
-### Terminal 4
+### Terminal 3
 
-You can enter number of questions to model 6. use terminal 3 to play the role in miner and listen to the contract deployed by terminal 2
+To play the role of the miner and listen to the contract deployed by terminal 2, execute the following command.
 
 ```sh
-python3 python3 deploy.py LCSOverPassMiner
+
+python3 demo.py LCSOverPassMiner
+
 ```
+
+Upon successful execution, you should see the following.
+
+
 
 7. use terminal 4 to track the log
 
