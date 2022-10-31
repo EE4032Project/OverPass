@@ -30,7 +30,7 @@ Our project can optimize smart contracts based on the functions below.
 3. Node 16
 4. Ganache CLI
 
-### Section 3: How to interact <a name="#section-3-how-to-interact"></a>
+## Section 3: How to interact <a name="#section-3-how-to-interact"></a>
 
 1. Clone the github repository and enter into the directory.
 
@@ -52,7 +52,7 @@ pip3 install -r requirements.txt
 
 4. Open up 4 terminals.
 
-#### Terminal 1:
+### Terminal 1:
 
 Start up the ganachetest net. You may specify the number of accounts that you
 would like to generate which, for our case, is 100.
@@ -65,7 +65,7 @@ sh start_gananche_testnet.sh 100 # Start up the ganache test net
 
 ```
 
-#### Terminal 2
+### Terminal 2
 
 Deploy the LCSOverPass on Truffle network
 
@@ -79,18 +79,15 @@ You should see the following after you have executed the command successfully.
 ```sh
 
 contract address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
-times_to_delegate: 3
+times_to_delegate: 1
 
 ```
 
-Specify the number of questions that you would like to model, which for our case is 3.
+Specify the number of questions that you would like to model, which for our case is 1.
 After you press enter, you should see something like this.
 
-```
-
-```
-
 ### Terminal 4
+
 You can enter number of questions to model 6. use terminal 3 to play the role in miner and listen to the contract deployed by terminal 2
 
 ```sh
