@@ -12,14 +12,9 @@ import sys
 import time
 import logging
 import queue
-from utils import thread_with_trace, lock
+from utils import thread_with_trace, lock, get_testcase
 import os
-import testcase
 import requests
-
-
-
-
 
 class OverPassException(Exception):
     def __init__(self, _type="py",_message="OverPassError"):
@@ -611,7 +606,8 @@ if __name__=="__main__":
         gas_sum = 0
         # TODO: the task ID should be fetched from receipt
         for i in range(int(times_to_delegate)):
-            response = op_LCS.delegate_compute("jshdikalk","jdhsifnsd",10**18)
+            test = get_testcase(i)
+            response = op_LCS.delegate_compute(test[0],test[1],10**18)
             print("Gas used: ",vars(response)['gasUsed'])
             gas_sum += int(vars(response)['gasUsed'])
             print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(i))
@@ -641,7 +637,9 @@ if __name__=="__main__":
 
         gas_sum = 0
         for i in range(int(times_to_compute)):
-            response = op_LCS.compute_lcs("he","hex")
+            test = get_testcase(i)
+
+            response = op_LCS.compute_lcs(test[0],test[1])
             print("Gas used: ",vars(response)['gasUsed'])
             # print(response)
             #time.sleep(20)
