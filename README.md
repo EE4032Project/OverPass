@@ -96,7 +96,6 @@ On terminal 1, you should see the following.
 
 <img width="623" alt="Screenshot 2022-10-31 at 12 43 32 PM" src="https://user-images.githubusercontent.com/88195289/198932724-cd448ee9-5b12-4bf4-a485-7bcdce10deb4.png">
 
-
 ### Terminal 3
 
 To play the role of the miner and listen to the contract deployed by terminal 2, execute the following command.
@@ -107,11 +106,9 @@ python3 demo.py LCSOverPassMiner
 
 ```
 
-Upon successful execution, you should see the following.
+### Terminal 4
 
-
-
-7. use terminal 4 to track the log
+To log down the information, execute the following command on terminal 4.
 
 ```sh
 tail -f logs.log
@@ -147,7 +144,6 @@ your terminal.
 
 ```sh
 
-sudo yarn global add ganache # If you are using yarn
 sudo npm install -g ganache # If you are installing npm
 
 ```
