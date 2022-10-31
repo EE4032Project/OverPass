@@ -1,6 +1,12 @@
 # EE4032 (Project title)
 
-## Introduction
+## Table of Contents
+
+1. [Introduction](#section-1-introduction)
+2. [Prerequisites](#section-2-prerequisites)
+3. [How to interact](#section-3-how-to-interact)
+
+## Section 1: Introduction <a name="section-1-introduction"></a>
 
 Smart contracts provide trust computing. Once a smart contract has been engaged, it will complete exactly how it was coded and no parties can interfere or change the result. However, the computation is usually expensive and slow. There exists a set of problem where there is sign showing that verification on answer is cheaper than searching the answer. Hence well-defined incentive mechanism can be applied to delegate searching computation to untrusted computational power (off-chain server) while the completeness and soundness of the computation is still guaranteed:
 
@@ -11,40 +17,51 @@ Smart contracts provide trust computing. Once a smart contract has been engaged,
   - otherwise: reject
 
 Our project can optimize smart contracts based on the functions below.
-| function | cons |
-| ------ | ------ |
-| local conputation | fast |
-| verification | cheap |
 
-## How to start
+|     Function      | Cons  |
+| :---------------: | :---: |
+| local conputation | fast  |
+|   verification    | cheap |
 
-### On Mac Environment
+## Section 2: Prerequisites <a name="#section-2-prerequisites"></a>
 
-1. Ensures python 3 environment, here we suggest download Anaconda
+1. Homebrew (Mac Users only)
+2. Python 3 environment
+3. Node 16
+4. Ganache CLI
 
-```sh
-brew install --cask anaconda
-```
+### Section 3: How to interact <a name="#section-3-how-to-interact"></a>
 
-2. Install npm
-
-```sh
-brew install node
-```
-
-3. Clone github repo
+1. Clone the github repository and enter into the directory.
 
 ```sh
 git clone https://github.com/EE4032Project/OverPass.git && cd OverPass
 ```
 
-3. Install python libraries
+2. Even though it is optional, we recommend activating a virtual environment to
+   localise all the installation of the python libraries into the folder. Refer to the
+   remarks for instructions on how to activate a virtual environment.
+
+3. Install the required python libraries
 
 ```sh
+
 pip3 install -r requirements.txt
+
 ```
 
-4. use terminal 1 and enter `$OVER_PASS/testnet`
+4. Open up 4 terminals.
+
+#### Terminal 1:
+
+```sh
+
+cd testnet # Enter the testnet directory
+
+
+```
+
+use terminal 1 and enter `$OVER_PASS/testnet`
 
 ```sh
 
@@ -57,10 +74,10 @@ where 100 means generate 100 accounts 5. use terminal 2 to deploy LCSOverPass on
 python3 demo.py LCSOverPass
 ```
 
-You can enter number of questions to model
-6. use terminal 3 to play the role in miner and listen to the contract deployed by terminal 2
+You can enter number of questions to model 6. use terminal 3 to play the role in miner and listen to the contract deployed by terminal 2
+
 ```sh
-python3 python3 deploy.py LCSOverPassMiner 
+python3 python3 deploy.py LCSOverPassMiner
 ```
 
 7. use terminal 4 to track the log
@@ -69,17 +86,28 @@ python3 python3 deploy.py LCSOverPassMiner
 tail -f logs.log
 ```
 
-## Remarks
+## Section 4: Remarks
 
-Suppose you are only using the python files solely for this project, we recommend that you
-create a virtual environment using the following command. You would need to activate the
-virtual environment everytime you would like to run the files.
+### Section 4.1. Installing Python3 Environment
+
+If you do not have a Python3 environment, we recommend installing anaconda using the following command.
+
+```sh
+brew install --cask anaconda # Mac Environment: Installed using homebrew
+```
+
+### Section 4.2. Installing Node16
+
+```sh
+brew install node # Mac Environment: Installed using homebrew
+```
+
+### Section 4.3. Installing Virtual Environment
 
 ```sh
 
-python3 -m venv venv
-. venv/bin/activate
-
+python3 -m venv venv # Create a virtual environment in the directory called venv
+. venv/bin/activate # Activate the virtual environment. You should see a (venv) in terminal
 
 ```
 
