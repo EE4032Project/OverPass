@@ -7,4 +7,4 @@ def testcase(A_len,B_len, alphabet_size):
 
     return ''.join(A), ''.join(B)
 
-print(testcase(10, 20,5))
+#print(testcase(10, 20,5))
