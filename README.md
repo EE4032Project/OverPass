@@ -49,12 +49,30 @@ This project introduces a standard for OverPass, see `overpass.sol` and also imp
 
 
 
-## Section 3: Prerequisites <a name="#section-3-prerequisites"></a>
-
+## Section 3: Prerequisites <a name="#section-2-prerequisites"></a>
+### Mac Users:
 1. Homebrew (Mac Users only)
 2. Python 3 environment
 3. Node 16
 4. Ganache CLI
+
+### Windows Users:
+1. WSL and Ubuntu. 
+Download WSL and Ubuntu by using the following site: https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview. 
+Note that we recommend Ubuntu 20.04 LTS for the Ubuntu Version and it is suffiecient to follow until steps 4.
+2. Latest version of Node Version Manager (nvm) and pick Node 16. 
+Download nvm by using the following site: https://blog.devsharma.live/setting-up-nodejs-with-nvm-on-wsl-2
+After installing nvm, you can type the following command to install Node 16 and its relevant npm
+```sh
+nvm install 16
+nvm use <node version>
+```
+3. Python 3 (Should be installed automatically for Ubuntu. We can check by typing: python3 --version)
+4. Ganache CLI (See [Remarks](#section-4-remarks))
+5. For opening new terminals, tap the windows menu, type ubuntu and enter
+
+
+
 
 ## Section 4: How to interact <a name="#section-4-how-to-interact"></a>
 
