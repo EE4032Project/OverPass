@@ -3,9 +3,14 @@
 ## Table of Contents
 
 1. [Introduction](#section-1-introduction)
-2. [Prerequisites](#section-2-prerequisites)
-3. [How to interact](#section-3-how-to-interact)
-4. [Remarks](#section-4-remarks)
+2. [Theoretical background](#section-2-Theoretical-background)
+3. [Prerequisites](#section-3-prerequisites)
+4. [How to interact](#section-4-how-to-interact)
+5. [Remarks](#section-5-remarks)
+    5.1 [Installing Python3 Environment](#section-5.1-phython-environment)
+    5.2 [Installing Node16](#section-5.2-node16)
+    5.3. [Installing Virtual Environment](#section-5.3-virtual-environment)
+6. [Acknowledgement](#section-6-acknowledgement)
 
 ## Section 1: Introduction <a name="section-1-introduction"></a>
 
@@ -30,7 +35,7 @@ An overview of the overpass is as follows:
 
 Un-trusted miners provide computation power to OverPass and the correctness of execution is guaranteed by the verification algorithm on OverPass(smart contract). The detailed theoretical background would be introduced in section 2.
 
-## Section 2: 
+## Section 2: Theoretical background <a name="section-1-Theoretical-background"></a>
 The theory of computation is shaped by the Interactive Proof (IP) system [\[Goldwasser, Micali & Rockoff, 1989\]](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf), where a strong, possibly malicious, prover interact with a weak verifier, and at the end of the computation, the client can output answer achiving [completeness](https://en.wikipedia.org/wiki/Completeness_(cryptography)) and [soundness](https://en.wikipedia.org/wiki/Zero-knowledge_proof#:~:text=Completeness%3A%20if%20the%20statement%20is,except%20with%20some%20small%20probability.). It's proved that [IP=PSPACE](https://en.wikipedia.org/wiki/IP_(complexity)) and hence programs run on Turing machine generally have a polynomial interactive proof scheme. There are signs that many problems has cheaper verification algorithm than search algorithm(e.g., NP-complete, sorting). This triggered a novel idea on trust-worthy computation that not all work should be done on the trusted slow "computer", or verifier, as long as the un-trusted computational power can provide proof for the answer to the verifier. This would expand the computational power of consented computers (e.g. EVM) tremendously while the trust of the computation is maintained. An incentive mechanism is made such that miners have the incentive to mine by executing the protocol honestly and the verifier has the incentive to participate and save gas fees from achieving the same goal. An example of the incentive mechanism is as follows:
 
 |    client \  advisor   | Honest |Cheat  | 
@@ -44,14 +49,14 @@ This project introduces a standard for OverPass, see `overpass.sol` and also imp
 
 
 
-## Section 3: Prerequisites <a name="#section-2-prerequisites"></a>
+## Section 3: Prerequisites <a name="#section-3-prerequisites"></a>
 
 1. Homebrew (Mac Users only)
 2. Python 3 environment
 3. Node 16
 4. Ganache CLI
 
-## Section 4: How to interact <a name="#section-3-how-to-interact"></a>
+## Section 4: How to interact <a name="#section-4-how-to-interact"></a>
 
 1. Clone the github repository and enter into the directory.
 
@@ -175,7 +180,7 @@ On `Terminal 2`, you should see the following
 
 ## Section 5: Remarks<a name="section-4-remarks"></a>
 
-### Section 5.1. Installing Python3 Environment
+### Section 5.1. Installing Python3 Environment <a name="section-5.1-phython-environment"></a>
 
 If you do not have a Python3 environment, we recommend installing anaconda using the following command.
 
@@ -183,13 +188,13 @@ If you do not have a Python3 environment, we recommend installing anaconda using
 brew install --cask anaconda # Mac Environment: Installed using homebrew
 ```
 
-### Section 5.2. Installing Node16
+### Section 5.2. Installing Node16<a name="section-5.2-node16"></a>
 
 ```sh
 brew install node # Mac Environment: Installed using homebrew
 ```
 
-### Section 5.3. Installing Virtual Environment
+### Section 5.3. Installing Virtual Environment<a name="section-5.3-virtual-environment"></a>
 
 ```sh
 
@@ -207,7 +212,7 @@ sudo npm install -g ganache # If you are installing npm
 
 ```
 
-## Acknowledgement
+## Section 6:Acknowledgement<a name="section-6-acknowledgement"></a>
 
 For production environments...
 
