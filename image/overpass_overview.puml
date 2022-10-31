@@ -1,0 +1,21 @@
+@startuml
+actor       User       as Foo1
+collections OverPass as Foo2
+actor       Miners      as Foo3
+
+Foo1 -> Foo2 : delegateCompute(args *)
+activate Foo2
+Foo2 -> Foo2: estimate Gas and accept question
+activate Foo2
+deactivate Foo2
+Foo2 -> Foo3: broad cast new task
+deactivate Foo2
+Foo3 -> Foo2: advise(ans, args *)
+activate Foo2
+Foo2 -> Foo2: verify answer and accept if valid
+activate Foo2
+deactivate Foo2
+deactivate Foo2
+Foo1 -> Foo2 : getAnswer(taskId)
+Foo3 -> Foo2: getIncentive(ans, args *)
+@enduml
