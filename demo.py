@@ -384,7 +384,7 @@ class LCSOverPassMiner:
             try:
                 op_instance = self.w3.eth.contract(address=_addr, abi=self.abi)
                 event_filter= op_instance.events.postNewQuestion.createFilter(fromBlock='latest')
-                self.listeningAddresses[_addr]=thread_with_trace(target=self.log_loop, args=(event_filter, 2))
+                self.listeningAddresses[_addr]=thread_with_trace(target=self.log_loop, args=(event_filter, 20))
                 self.listeningAddresses[_addr].start()
                 print("Start listening on address:", _addr)
 
@@ -545,7 +545,7 @@ if __name__=="__main__":
             response = op_LCS.delegate_compute(test_case[0],test_case[1], 10**18)
             print("Gas used: ",vars(response)['gasUsed'])
             gas_sum += vars(response)['gasUsed']
-            #time.sleep(20)
+            time.sleep(20)
         print(f"Average Overpass Gas Fee for {times_to_delegate} testcases is: {gas_sum/times_to_delegate}")
         print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(1))
 
@@ -577,7 +577,7 @@ if __name__=="__main__":
             print("Gas used: ",vars(response)['gasUsed'])
             gas_sum += vars(response)['gasUsed']
             # print(response)
-            #time.sleep(20)
+            time.sleep(20)
         print(f"Average LCS (non-overpass) Gas Fee for {times_to_compute} testcases is: {gas_sum/times_to_compute}")
 
         print("Cumulative Gas Used: ", int(vars(response)['gasUsed']) * int(times_to_compute))
