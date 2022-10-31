@@ -25,3 +25,4 @@ def get_testcase(i):
 
 for i in range(0,10):
     print(get_testcase(i))
+
