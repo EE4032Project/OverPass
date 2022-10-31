@@ -71,28 +71,25 @@ class LCSOverPass:
         self.w3.middleware_onion.add(middleware.simple_cache_middleware)
         self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
         self.blocknumber = -1
-        self.feePerGas = None 
+        self.feePerGas = self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price
 
-    def estimateGasPrice(self):
+    @staticmethod
+    def estimateGasPrice():
         url = "https://api.owlracle.info/v3/eth/gas?apikey="+API_KEY if API_KEY!="" else 'https://api.owlracle.info/v3/eth/gas'
         res = requests.get(url)
         data = res.json()
-        if self.feePerGas == None:
-            try:
-                self.feePerGas = int(data['speeds'][0]["maxFeePerGas"])*(10**9)
-            except:
-                print(traceback.format_exc())
-                self.feePerGas = self.w3.eth.gas_price
-        return self.feePerGas
+        # average price 2022
+        feePerGas = 20*(10**9)
+        try:
+            feePerGas = int(data['speeds'][0]["maxFeePerGas"])*(10**9)
+        except:
+            print(traceback.format_exc())
+            # average price 2022
+            feePerGas = 20*(10**9)
+        return feePerGas
         # the unit is GWei
 
     def updateNonce(self):
-        # block = self.w3.eth.get_block('latest')
-        # if self.blocknumber == block['number']:
-        #     self.nonce += 1
-        # else:
-        #     self.blocknumber = block['number']
-        #     self.nonce = self.w3.eth.getTransactionCount(self.my_address)
         self.nonce += 1
         
         
@@ -135,11 +132,8 @@ class LCSOverPass:
         if self.overpass_instance == None:
             # 1.  Build a transaction
             overpassContract = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
-            lk = lock.acquire('txn.lock')
-            if lk is None:
-                raise OverPassException("py", traceback.format_exc())
             self.updateNonce()
-            transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price, "from": self.my_address, "nonce": self.nonce})
+            transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": int(self.feePerGas), "from": self.my_address, "nonce": self.nonce})
             # 2. Sign a transaction
             signed_txn = self.w3.eth.account.sign_transaction( transaction, private_key=self.private_key)
             # 3. Send a transaction
@@ -152,19 +146,14 @@ class LCSOverPass:
 
             except:
                 raise OverPassException("sol", traceback.format_exc())
-            finally:
-                lock.release(lk)
         else:
             raise OverPassException("py", "Contract deployed already")
 
     # delegate a contract
     def delegate_compute(self, str1:str, str2: str, _incentive: int):
-        lk = lock.acquire('txn.lock')
-        if lk is None:
-            raise OverPassException("py", traceback.format_exc())
         self.updateNonce()
         transaction = self.overpass_instance.functions.delegate_compute(['LCS',str1,str2], 2).buildTransaction(
-            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price, "nonce":  self.nonce, "gas": 3*10**6, "value":_incentive})
+            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": int(self.feePerGas), "nonce":  self.nonce, "gas": 3*10**6, "value":_incentive})
         signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
         try:
@@ -172,8 +161,7 @@ class LCSOverPass:
             return tx_receipt
         except:
             raise OverPassException("solidity", traceback.format_exc())
-        finally:
-            lock.release(lk)
+
 
 
 
@@ -225,19 +213,23 @@ class LCS:
 
         self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
 
-        self.feePerGas = None 
+        self.feePerGas = self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price
 
-    def estimateGasPrice(self):
+
+    @staticmethod
+    def estimateGasPrice():
         url = "https://api.owlracle.info/v3/eth/gas?apikey="+API_KEY if API_KEY!="" else 'https://api.owlracle.info/v3/eth/gas'
         res = requests.get(url)
         data = res.json()
-        if self.feePerGas == None:
-            try:
-                self.feePerGas = int(data['speeds'][0]["maxFeePerGas"])*(10**9)
-            except:
-                print(traceback.format_exc())
-                self.feePerGas = self.w3.eth.gas_price
-        return self.feePerGas
+        # average price 2022
+        feePerGas = 20*(10**9)
+        try:
+            feePerGas = int(data['speeds'][0]["maxFeePerGas"])*(10**9)
+        except:
+            print(traceback.format_exc())
+            # average price 2022
+            feePerGas = 20*(10**9)
+        return feePerGas
         # the unit is GWei
 
 
@@ -267,12 +259,6 @@ class LCS:
 
 
     def updateNonce(self):
-        # block = self.w3.eth.get_block('latest')
-        # if self.blocknumber == block['number']:
-        #     self.nonce += 1
-        # else:
-        #     self.blocknumber = block['number']
-        #     self.nonce = self.w3.eth.getTransactionCount(self.my_address)
         self.nonce += 1
         
     
@@ -290,11 +276,11 @@ class LCS:
         if self.overpass_instance == None:
             # 1.  Build a transaction
             overpassContract = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
-            lk = lock.acquire('txn.lock')
-            if lk is None:
-                raise OverPassException("py", traceback.format_exc())
+            #lk = lock.acquire('txn.lock')
+            #if lk is None:
+                #raise OverPassException("py", traceback.format_exc())
             self.updateNonce()
-            transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price, "from": self.my_address, "nonce": self.nonce})
+            transaction = overpassContract.constructor().buildTransaction({"chainId": self.chain_id, "gasPrice": int(self.feePerGas), "from": self.my_address, "nonce": self.nonce})
             # 2. Sign a transaction
             signed_txn = self.w3.eth.account.sign_transaction( transaction, private_key=self.private_key)
             # 3. Send a transaction
@@ -307,19 +293,19 @@ class LCS:
 
             except:
                 raise OverPassException("sol", traceback.format_exc())
-            finally:
-                lock.release(lk)
+            #finally:
+                #lock.release(lk)
         else:
             raise OverPassException("py", "Contract deployed already")
 
     # Compute LCS contract
     def compute_lcs(self, str1:str, str2: str):
-        lk = lock.acquire('txn.lock')
-        if lk is None:
-            raise OverPassException("py", traceback.format_exc())
+        #lk = lock.acquire('txn.lock')
+        #if lk is None:
+            #raise OverPassException("py", traceback.format_exc())
         self.updateNonce()
         transaction = self.overpass_instance.functions.lcs(str1,str2).buildTransaction(
-            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price, "nonce":  self.nonce, "gas": 3*10**6})
+            {"chainId": self.chain_id, "from": self.my_address, "gasPrice": int(self.feePerGas), "nonce":  self.nonce, "gas": 3*10**6})
         signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
         try:
             tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
@@ -328,8 +314,8 @@ class LCS:
         except:
             print(traceback.format_exc())
             raise OverPassException("solidity", traceback.format_exc())
-        finally:
-            lock.release(lk)
+        #finally:
+            #lock.release(lk)
 
 
     # As there is no function of getTaskApproxFee and checkAns function in LCS.sol, this doesn't need to be included
@@ -363,19 +349,24 @@ class LCSOverPassMiner:
         self.q = queue.Queue()
         self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
         self.blocknumber =0
-        self.feePerGas = None 
+        self.feePerGas = self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price
+        self.incentiveGot = 0
+    
 
-    def estimateGasPrice(self):
+    @staticmethod
+    def estimateGasPrice():
         url = "https://api.owlracle.info/v3/eth/gas?apikey="+API_KEY if API_KEY!="" else 'https://api.owlracle.info/v3/eth/gas'
         res = requests.get(url)
         data = res.json()
-        if self.feePerGas == None:
-            try:
-                self.feePerGas = int(data['speeds'][0]["maxFeePerGas"])*(10**9)
-            except:
-                print(traceback.format_exc())
-                self.feePerGas = self.w3.eth.gas_price
-        return self.feePerGas
+        # average price 2022
+        feePerGas = 20*(10**9)
+        try:
+            feePerGas = int(data['speeds'][0]["maxFeePerGas"])*(10**9)
+        except:
+            print(traceback.format_exc())
+            # average price 2022
+            feePerGas = 20*(10**9)
+        return feePerGas
         # the unit is GWei
 
 
@@ -386,12 +377,6 @@ class LCSOverPassMiner:
 
     
     def updateNonce(self):
-        # block = self.w3.eth.get_block('latest')
-        # if self.blocknumber == block['number']:
-        #     self.nonce += 1
-        # else:
-        #     self.blocknumber = block['number']
-        #     self.nonce = self.w3.eth.getTransactionCount(self.my_address)
         self.nonce += 1
         
 
@@ -410,29 +395,19 @@ class LCSOverPassMiner:
             logging.info("answer: \n llcs:{llcs}\n lcs:{lcs}".format(llcs=llcs, lcs=lcs))
             contract_address = eventInfo['address']
             try:
-                lk = lock.acquire('txn.lock')
+                self.updateNonce()
                 op_instance = self.w3.eth.contract(address=contract_address , abi=self.abi)
-                self.updateNonce()
-                # advise
-                # try get lock
-
-                if lk is None:
-                    logging.info("failed to get lock to advise task "+str(eventInfo['args']['taskId'])+traceback.format_exc())
-                    return
-                self.updateNonce()
-
-                transaction = op_instance.functions.advise(eventInfo['args']['taskId'], llcs, [lcs]).buildTransaction({"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price, "nonce":  self.nonce, "gas": 3*10**6})
+                transaction = op_instance.functions.advise(eventInfo['args']['taskId'], llcs, [lcs]).buildTransaction({"chainId": self.chain_id, "from": self.my_address, "gasPrice": int(self.feePerGas), "nonce":  self.nonce, "gas": 3*10**6})
                 signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
                 tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
                 tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
                 logging.info("succeed to advise task "+str(eventInfo['args']['taskId'])+" \n"+str(tx_receipt))
-                # getIncentive
                 self.q.put([contract_address,str(eventInfo['args']['taskId'])])
-                lock.release(lk)
-
+                self.incentiveGot += int(eventInfo['args']["incentive"])
             except:
+                print(traceback.format_exc())
+                self.feePerGas*=1.5
                 logging.info("failed to advise task "+str(eventInfo['args']['taskId'])+traceback.format_exc())
-                lock.release(lk)
 
         else:
             logging.info("Not interested task, taskId:"+str(eventInfo['args']['taskId'])+traceback.format_exc())
@@ -478,25 +453,24 @@ class LCSOverPassMiner:
     def get_incentive(self):
         cnt = 0
         while not self.q.empty():
-            task = q.get(block=False)
+            task = self.q.get(block=False)
             try:
-                lk = lock.acquire('txn.lock')
                 self.updateNonce()
                 contract_address = task[0]
                 taskId = int(task[1])
                 op_instance = self.w3.eth.contract(address=contract_address , abi=self.abi)
-                self.updateNonce()
-                transaction = op_instance.functions.getIncentive(taskId).buildTransaction({"chainId": self.chain_id, "from": self.my_address, "gasPrice": self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price, "nonce":  self.nonce, "gas": 3*10**6})
+                transaction = op_instance.functions.getIncentive(taskId).buildTransaction({"chainId": self.chain_id, "from": self.my_address, "gasPrice": int(self.feePerGas), "nonce":  self.nonce, "gas": 3*10**6})
                 signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
                 tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
                 tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
                 logging.info("succeed to get incentive of  task "+contract_address+":"+str(taskId)+" \n"+str(tx_receipt))
-                lock.release(lk)
                 cnt += 1
+                break
             except:
-                q.put(task)
-                logging.info("failed to get incentive of  task "+contract_address+":"+str(taskId)+" \n"+str(tx_receipt))
-                lock.release(lk)
+                self.q.put(task)
+                self.feePerGas *= 1.5
+                logging.info("failed to get incentive of  task "+contract_address+":"+str(taskId)+" \n")
+                print(traceback.format_exc())
         return cnt
 
 
@@ -595,6 +569,7 @@ if __name__=="__main__":
 
 
 
+
     if len(sys.argv)>1 and sys.argv[1].strip()== "LCSOverPass":
         my_address = addresses[0]
         my_private_key = keys_dict["private_keys"][my_address]
@@ -614,7 +589,8 @@ if __name__=="__main__":
             response = op_LCS.delegate_compute("jshdikalk","jdhsifnsd",10**18)
             print("Gas used: ",vars(response)['gasUsed'])
             gas_sum += int(vars(response)['gasUsed'])
-            print("Approximate Gas Fee for Task: ",op_LCS.getTaskApproxGasFee(i))
+            print("Approximate Gas Fee for Task: ", int(vars(response)['gasUsed'])*op_LCS.feePerGas)
+            time.sleep(2)
         print(f"Average Overpass Gas Fee for {times_to_delegate} testcases is: {gas_sum/times_to_delegate}")
         
 
@@ -643,8 +619,6 @@ if __name__=="__main__":
         for i in range(int(times_to_compute)):
             response = op_LCS.compute_lcs("he","hex")
             print("Gas used: ",vars(response)['gasUsed'])
-            # print(response)
-            #time.sleep(20)
             gas_sum += 1
 
         print(f"Average LCS Gas Fee for {times_to_compute} testcases is: {gas_sum/times_to_compute}")
