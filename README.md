@@ -9,37 +9,37 @@
 
 ## Section 1: Introduction <a name="section-1-introduction"></a>
 
-Smart contracts provide trust computing. Once a smart contract has been engaged, it will complete exactly how it was coded and no parties can interfere or change the result. However, the computation is usually expensive and slow. There exists a set of problem where there is sign showing that verification on answer is cheaper than searching the answer. Hence well-defined incentive mechanism can be applied to delegate searching computation to untrusted computational power (off-chain server) while the completeness and soundness of the computation is still guaranteed:
+Smart contracts provide trust computing. Once a smart contract has been engaged, it will complete exactly how it was coded and no parties can interfere or change the result. However, the computation is usually expensive and slow. There exists a set of problems where there is signs showing that verifying answers is cheaper than searching for the answer. Hence well-defined incentive mechanism can be applied to delegate searching computation to untrusted computational power (off-chain server) while the completeness and soundness of the computation is still guaranteed:
 
 - A delegation task is posted on smart contract together with a trusted verification function
-- Some untrusted machine would listening to the task event, and provide answers/adivices that could help smart contract solving the problem.
+- Some untrusted machines would listen to the task event and provide answers/advice that could help smart contract solve the problem.
 - Smart contract verifies the answer:
   - pass verification: provide the outputs to customers & give incentives to local computers
   - otherwise: reject
 
-Our project can optimize smart contracts by providing cheaper gas consumption for complex computation problemS combining the pros of both EVM and un-trusted computational power as shown below
+Our project can optimize smart contracts by providing cheaper gas consumption for complex computation problemS combining the pros of both EVM and un-trusted computational power as shown below:
 
 |     Function      | Pros |Cons  | 
 | :---------------: | :---: |:---: |
 | local conputation | fast and cheap  | un-trusted|
 |   smart contract    | trusted  | slow |
 
-An overview of overpass is as follows:
+An overview of the overpass is as follows:
 
 ![Sequence Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/EE4032Project/OverPass/main/image/overpass_overview.puml)
 
-Un-trusted miners provide computation power to overpass and the correctness of execution is guaranteed by the verification algorithm on overpass(smart contract). Detailed theoretical background would be introduced in section 2.
+Un-trusted miners provide computation power to OverPass and the correctness of execution is guaranteed by the verification algorithm on OverPass(smart contract). The detailed theoretical background would be introduced in section 2.
 
 ## Section 2: 
-Theory of computation is shaped by Interactive Proof (IP) system [\[Goldwasser, Micali & Rockoff, 1989\]](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf), where a strong, possibly malicious, prover interact with a weak verifier, and at the end of the computation, client can output answer achiving [completeness](https://en.wikipedia.org/wiki/Completeness_(cryptography)) and [soundness](https://en.wikipedia.org/wiki/Zero-knowledge_proof#:~:text=Completeness%3A%20if%20the%20statement%20is,except%20with%20some%20small%20probability.). It's proved that [IP=PSPACE](https://en.wikipedia.org/wiki/IP_(complexity)) and hence programs run on Turing machine generally have an polynomial interactive proof scheme. There is sign that many problem has cheaper verification algorithm than search algorithm(e.g. NP-complete, sorting). This triggerred a novel idea on trust-worthy computation that not all work should be done on the trusted slow "computer", or verifier, as long as the un-trusted computational power can provid a proof for the answer to the verifier. This would expand the computational power of consented computer (e.g. EVM) trimentically while the trustness of the computation is maintained. A incentive mechanism is made such that miners have incentive to mine by executing the protocol honestly and verifier has incentive to participate and save gas fee to achieve the same goal. An example of the incentive mechanism is as follows:
+The theory of computation is shaped by the Interactive Proof (IP) system [\[Goldwasser, Micali & Rockoff, 1989\]](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf), where a strong, possibly malicious, prover interact with a weak verifier, and at the end of the computation, the client can output answer achiving [completeness](https://en.wikipedia.org/wiki/Completeness_(cryptography)) and [soundness](https://en.wikipedia.org/wiki/Zero-knowledge_proof#:~:text=Completeness%3A%20if%20the%20statement%20is,except%20with%20some%20small%20probability.). It's proved that [IP=PSPACE](https://en.wikipedia.org/wiki/IP_(complexity)) and hence programs run on Turing machine generally have a polynomial interactive proof scheme. There are signs that many problems has cheaper verification algorithm than search algorithm(e.g., NP-complete, sorting). This triggered a novel idea on trust-worthy computation that not all work should be done on the trusted slow "computer", or verifier, as long as the un-trusted computational power can provide proof for the answer to the verifier. This would expand the computational power of consented computers (e.g. EVM) tremendously while the trust of the computation is maintained. An incentive mechanism is made such that miners have the incentive to mine by executing the protocol honestly and the verifier has the incentive to participate and save gas fees from achieving the same goal. An example of the incentive mechanism is as follows:
 
 |    client \  advisor   | Honest |Cheat  | 
 | :---------------: | :---: |:---: |
 |  use OverPass| (Answer_incentive - gas_verify, incentive - gas_verify)  | (0, - gas_verify)|
 |   not user OverPass   | (Answer_incentive - gas_search, 0)  | (Answer_incentive - gas_search, 0) |
-Given that gas for searching is much higher than gas for verifier, and a wide incentive is set by the client, client use OverPass and Advisor be honest is the Nash Equilibrium. Note that the mechanism would work under the assumption that the client is rationale and at leadt one advisor is rationale and selfish, which is very robust.
+Given that gas for searching is much higher than gas for verifier, and a wide incentive is set by the client, the client use OverPass and Advisor be honest, is the Nash Equilibrium. Note that the mechanism would work under the assumption that the client is a rationale and at least one advisor is rationale and selfish, which is very robust.
 
-This project introduce a standard for overpass, see `overpass.sol` and also implement a demo project for Longest Common Subsequence Problem(LCS) for two strings, which has O(mn) search algorithm and O(m+n) verification algorithm, where m and n are the length of the two strings respectively.
+This project introduces a standard for OverPass, see `overpass.sol` and also implements a demo project for the Longest Common Subsequence Problem(LCS) for two strings, which has O(mn) search algorithm and O(m+n) verification algorithm, where m and n are the lengths of the two strings respectively.
 
 
 
@@ -72,8 +72,8 @@ pip3 install -r requirements.txt
 
 4. Open up 4 terminals.
 
-5. On `Terminal 1`, start up the ganachetest net. You may specify the number of accounts that you
-   would like to generate which, for our case, is 100.
+5. On `Terminal 1`, start up the ganache test net. You may specify the number of accounts that you
+   would like to generate, which, in our case, is 100.
 
 ```sh
 

@@ -1,7 +1,7 @@
 @startuml
 actor       User       as Foo1
-collections OverPass as Foo2
-actor       Miners      as Foo3
+collections "OverPass(Client)" as Foo2
+actor       "Miners(Advisor)"      as Foo3
 
 Foo1 -> Foo2 : delegateCompute(args *)
 activate Foo2
