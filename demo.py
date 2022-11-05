@@ -113,6 +113,7 @@ if __name__=="__main__":
             response = op_LCS.delegate_compute(test[0],test[1],10**17)
             print("Gas used: ",vars(response)['gasUsed'])
             gas_sum += int(vars(response)['gasUsed'])
+            time.sleep(5)
 
         print(f"LCSOverPass: Average Gas Used for {times_to_delegate} testcases is: {gas_sum/times_to_delegate}")
         print(f"Approximate Weis for one test one testcast is: {gas_sum*op_LCS.feePerGas/times_to_delegate}")

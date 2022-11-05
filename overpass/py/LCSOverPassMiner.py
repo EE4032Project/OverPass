@@ -42,6 +42,7 @@ from web3.gas_strategies.time_based import medium_gas_price_strategy
 
 from overpass.py.constant import MIDIUM_GAS_PRICE_ESTIMATOR_ON, HTTP_PROVIDER, STD_LOGGING_ON,FILE_LOGGING_ON, GAS_PRICE_STRATEGY_ON, API_KEY
 from overpass.py.utils import thread_with_trace, lock, get_testcase, OverPassException
+from overpass.py.LCSOverPass import LCSOverPass
 
 # OverPass miner
 class LCSOverPassMiner:
@@ -244,7 +245,6 @@ def overpass_miner_assistant(_my_address:str, _my_private_key:str):
             op_LCS_miner.maximumDuration = int(orders[1])
         elif orders[0] == 'get_incentive':
             cnt = op_LCS_miner.get_incentive()
-            print(f"obtained incentive from {cnt} tasks")
         else:
             print("illegal order")
 
