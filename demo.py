@@ -577,7 +577,7 @@ if __name__=="__main__":
             print("LCSOverPass is deployed successfully!\ncontract address: {contract_address}".format(contract_address=receipt['contractAddress']))
         except:
             print(traceback.format_exc())
-        times_to_delegate = input("times_to_delegate:")
+        times_to_delegate = int(input("times_to_delegate:"))
         gas_sum = 0
         # TODO: the task ID should be fetched from receipt
         for i in range(int(times_to_delegate)):
