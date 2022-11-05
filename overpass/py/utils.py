@@ -10,8 +10,8 @@ import random
 
 # [len a,len b, size alphabet]
 
-test_case_param = [ [40,90,30], [2000,500,15], [100000000,100000000,50], 
-                    [99999999999,222222222,40],[100,50000,30], [4000, 200, 3] ]
+test_case_param = [ [40,90,30], [2000,500,15], [100000,100000,50], 
+                    [999999,22222,40],[100,50000,30], [4000, 200, 3] ]
 
 def testcase(A_len,B_len, alphabet_size):
     if alphabet_size > 52:
@@ -104,3 +104,14 @@ class lock:
       fcntl.flock(lock_file_fd, fcntl.LOCK_UN)
       os.close(lock_file_fd)
       return None
+
+
+class OverPassException(Exception):
+    def __init__(self, _type="py",_message="OverPassError"):
+        self.message = _message
+        self.type = _type
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'OverPassError: {self.type} -> {self.message}'
+

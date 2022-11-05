@@ -132,4 +132,6 @@ package-lock.json
 package.json
 testnet/*.json
 overpass/*.json
+build/*
+log/*
 
