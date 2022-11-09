@@ -95,10 +95,9 @@ pip3 install -r requirements.txt
 
 ```
 
-4. Open up 4 terminals.
+4. Open up 3 terminals. The first terminal (`Terminal 1`) will be used to simulate the server, the second terminal will be used to simulate the user (`Terminal 2`) and the third terminal will be used to simulate the miner (`Terminal 3`). 
 
-5. On `Terminal 1`, start up the ganache test net. You may specify the number of accounts that you
-   would like to generate, which, in our case, is 100.
+5. On `Terminal 1`, we will load the local ganache server using the following code. You need to specify the number of accounts that you would like to generate. For example, if I want to start 100 accounts, I will indicate 100.
 
 ```sh
 
@@ -110,7 +109,30 @@ $ sh start_gananche_testnet.sh 100 # Start up the ganache test net
 
 Upon successful set up, you should see the following
 
-<img width="826" alt="Screenshot 2022-10-31 at 12 44 18 PM" src="https://user-images.githubusercontent.com/88195289/198932873-3322aa4c-c60e-418b-92f0-5bd38d89884e.png">
+```sh
+
+Accounts and keys saved to ./keys.json
+
+HD Wallet
+==============
+Mnemonic:
+Base HD Path:
+
+Default Gas Price
+==============
+
+BlockGas Limit
+==============
+
+Call Gas Limit
+==============
+
+ChainId
+==============
+
+RPC Listening on 
+
+```
 
 6. On `Terminal 2`, to log down the information, execute the following command.
 
