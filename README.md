@@ -134,22 +134,14 @@ RPC Listening on
 
 ```
 
-6. On `Terminal 2`, to log down the information, execute the following command.
-
-```sh
-
-$ tail -f logs.log
-
-```
-
-7. On `Terminal 3`, deploy the LCSOverPass on Truffle network
+6. To simulate the user, we would need to run the python file `demo.py` with the argument `LCSOverPass`.
 
 ```sh
 $ python3 demo.py LCSOverPass
 
 ```
 
-You should see the following after you have executed the command successfully.
+Upon successful execution, you should see the following.
 
 ```sh
 
