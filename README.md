@@ -103,8 +103,8 @@ pip3 install -r requirements.txt
 
 ```sh
 
-$ cd testnet # Enter the testnet directory
-$ sh start_gananche_testnet.sh 100 # Start up the ganache test net
+cd testnet # Enter the testnet directory
+sh start_gananche_testnet.sh 100 # Start up the ganache test net
 
 
 ```
@@ -173,7 +173,7 @@ Available orders:
 
 ```
 
-8. Copy the contract address from `Terminal 2`. On Terminal 3, we run the following command to listen to the address block.
+8. Copy the contract address from `Terminal 2`. On `Terminal 3`, we run the following command to listen to the address block.
 
 ```sh
 
@@ -207,15 +207,27 @@ times_to_delegate: 1
 
 After you press enter, you should see something like this on `Terminal 3`.
 
-<img width="826" alt="Screenshot 2022-10-31 at 12 40 25 PM" src="https://user-images.githubusercontent.com/88195289/198932572-a0f523c3-e85b-4d21-bd4f-5bd911e2c806.png">
+```sh
+
+test case: 1
+s1 len: 40
+s2 len: 90
+Gas used:  479193
+LCSOverPass: Average Gas Used for 1 testcases is: 479193.0
+Approximate Weis for one test one testcast is: 3.9773019e+16
+
+```
 
 On `Terminal 1`, you should see the following.
 
-<img width="826" alt="Screenshot 2022-10-31 at 12 43 32 PM" src="https://user-images.githubusercontent.com/88195289/198932724-cd448ee9-5b12-4bf4-a485-7bcdce10deb4.png">
+```sh
 
-On `Terminal 2`, you should see the following
+  Transaction: 0xc761a8adfcb9fc0650b6ed00d278b14c70b3ef0119ad2471eacff25223cdcf54
+  Gas usage: 145104
+  Block number: 3
+  Block time: Thu Nov 10 2022 00:07:30 GMT+0800 (Singapore Standard Time)
 
-<img width="826" alt="Screenshot 2022-10-31 at 1 51 02 PM" src="https://user-images.githubusercontent.com/88195289/198944446-140ada77-af0d-4776-bf0d-06705c3c7397.png">
+```
 
 ## Section 5: Remarks<a name="section-4-remarks"></a>
 
