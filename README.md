@@ -95,7 +95,9 @@ pip3 install -r requirements.txt
 
 ```
 
-4. Open up 3 terminals. The first terminal (`Terminal 1`) will be used to simulate the server, the second terminal will be used to simulate the user (`Terminal 2`) and the third terminal will be used to simulate the miner (`Terminal 3`). 
+### Hands-On session
+
+4. Open up 3 terminals. The first terminal (`Terminal 1`) will be used to simulate the server, the second terminal will be used to simulate the user (`Terminal 2`) and the third terminal will be used to simulate the miner (`Terminal 3`).
 
 5. On `Terminal 1`, we will load the local ganache server using the following code. You need to specify the number of accounts that you would like to generate. For example, if I want to start 100 accounts, I will indicate 100.
 
@@ -130,11 +132,11 @@ Call Gas Limit
 ChainId
 ==============
 
-RPC Listening on 
+RPC Listening on
 
 ```
 
-6. To simulate the user, we would need to run the python file `demo.py` with the argument `LCSOverPass`.
+6. To simulate the user, we would need to run the python file `demo.py` with the argument `LCSOverPass` on `Terminal 2`.
 
 ```sh
 $ python3 demo.py LCSOverPass
@@ -150,8 +152,7 @@ times_to_delegate:
 
 ```
 
-8. On `Terminal 4`, we can play the role of a miner and listen to the
-   contracct deployed on `Terminal 2` using the following command.
+7. Before we indicate the number of times to delegate, we need to have a miner to listen to the contract address. Therefore, on `Terminal 3`, we can simulate the role of a miner by running the `demo.py` file with the `miner` argument.
 
 ```sh
 
@@ -159,7 +160,7 @@ $ python3 demo.py LCSOverPassMiner
 
 ```
 
-You should see the following:
+Upon successful execution, you should see the following code.
 
 ```sh
 
