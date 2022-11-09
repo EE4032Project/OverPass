@@ -16,13 +16,14 @@
 
 Smart contracts provide trust computing. Once a smart contract has been engaged, it will complete exactly how it was coded and no parties can interfere or change the result. However, the computation is usually expensive and slow. There exists a set of problems where there is signs showing that verifying answers is cheaper than searching for the answer. Hence well-defined incentive mechanism can be applied to delegate searching computation to untrusted computational power (off-chain server) while the completeness and soundness of the computation is still guaranteed:
 
-- A delegation task is posted on smart contract together with a trusted verification function
-- Some untrusted machines would listen to the task event and provide answers/advice that could help smart contract solve the problem.
+-  User delegate task to the smart contract with an reward and life-time limit which contains a trusted verification function for incoming advices
+- Some untrusted machines (Miners) would listen to the task event and provide answers/advice with proof so it can be verified by the smart contract efficiently. 
 - Smart contract verifies the answer:
-  - pass verification: provide the outputs to customers & give incentives to local computers
+  - answer is correct AND more optimal than the exsisting best answer: save as the best answer so far
   - otherwise: reject
+- Once life-time is past, the best answer can be retrieved by the User and the provider of the best answer so far can retrieved the incentive. 
 
-Our project can optimize smart contracts by providing cheaper gas consumption for complex computation problemS combining the pros of both EVM and un-trusted computational power as shown below:
+Our project can optimize smart contracts by providing cheaper gas consumption for complex computation problems combining the pros of both EVM and un-trusted computational power as shown below:
 
 |     Function      |      Pros      |    Cons    |
 | :---------------: | :------------: | :--------: |
