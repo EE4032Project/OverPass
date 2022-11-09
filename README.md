@@ -229,6 +229,21 @@ On `Terminal 1`, you should see the following.
 
 ```
 
+Miners are incentivised to provide a more efficient solution. Supposed the solution is more effective than the current solution, they can execute `get_incentive` to get the rewards.
+
+```sh
+
+Order:get_incentive
+totalIncentiveGot: 100000000000000000 # In wei
+Available orders:
+ 1. listen <contract_address>
+ 2. unlisten <contract_address>
+ 3. min_incentive <min_incentive>
+ 4. maximum_duration <maximum_duration>
+ 5. get_incentive
+
+```
+
 ## Section 5: Remarks<a name="section-4-remarks"></a>
 
 ### Section 5.1. Installing Python3 Environment <a name="section-5.1-phython-environment"></a>
