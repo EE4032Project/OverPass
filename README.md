@@ -156,7 +156,7 @@ times_to_delegate:
 
 ```sh
 
-$ python3 demo.py LCSOverPassMiner
+$ python3 demo.py miner
 
 ```
 
@@ -173,25 +173,30 @@ Available orders:
 
 ```
 
-We can set the configurations, such as listening to the
-contract address using the following
+8. Copy the contract address from `Terminal 2`. On Terminal 3, we run the following command to listen to the address block.
 
 ```sh
 
-Order: listen 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab # The address is from Terminal 3
+Order: listen 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab # The address is from Terminal 2
 
 ```
 
-After this, we should see the following:
+Upon successful execution, we should receive the following code.
 
 ```sh
 
 Start listening on address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
+Available orders:
+1. listen <contract_address>
+2. unlisten <contract_address>
+3. min_incentive <min_incentive>
+4. maximum_duration <maximum_duration>
+5. get_incentive
+
 
 ```
 
-9. Specify the number of questions that you would like to model on `Terminal 3`,
-   which for our case is 1.
+9. Return to `Terminal 2`. As the user, specify the number of times you would like to delegate the task.
 
 ```sh
 
