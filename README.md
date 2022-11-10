@@ -11,6 +11,7 @@
    5.2 [Installing Node16](#section-5.2-node16) <br>
    5.3. [Installing Virtual Environment](#section-5.3-virtual-environment) <br>
 6. [Acknowledgement](#section-6-acknowledgement)
+7. [Competitors](#section-7-competitors)
 
 ## Section 1: Introduction <a name="section-1-introduction"></a>
 
@@ -278,10 +279,17 @@ sudo npm install -g ganache # If you are installing npm
 
 ```
 
-## Section 6:Acknowledgement<a name="section-6-acknowledgement"></a>
+## Section 6: Acknowledgement<a name="section-6-acknowledgement"></a>
 
 For production environments...
 
 ```sh
 
 ```
+
+## Section 7: Competitor Products <a name="section-7-competitors"></a>
+
+There are currently 2 competitor products, which are Solana and Arbitrum. First, Solana is a layer 1 blockchain that uses Proof of Stake (PoS) with Proof of History (PoH) to accelerate its average block validation times, which is around 10 times faster than Ethereum [1]. It also has a lower gas fee per transaction, which is around $0,0000014 per transaction [2]. Second, Arbitrum is a layer 2 blockchain that is built on top of Ethereum. It uses Interactive Fraud Proofs, which is a type of Interactive Proofing. The basic idea of Interactive Fraud Proofing is that both the prover and verifier will try to check/bisect each other answers until they disagree to one or more things. This will, then, be run on the main Ethereum network. On the other hand, our project will be focusing on Doubly Efficient Interactive Proofing and not Interactive Fraud Proofing. We can see section 2 (Theoretical Background) for the explanation of Doubly Efficient Interactive Proofing. <br>
+Source:
+1.	Tyson, M. (2022, July 28). Solana blockchain and the Proof of History. InfoWorld. https://www.infoworld.com/article/3666736/solana-blockchain-and-the-proof-of-history.html
+2.	Vasile, Iulia. (29 July 2022). Solana vs. Ethereum: An Ultimate Comparison. https://beincrypto.com/learn/solana-vs-ethereum/#:~:text=Ethereum%20has%20a%20higher%20transaction,0%2C0000014
