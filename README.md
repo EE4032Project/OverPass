@@ -95,39 +95,55 @@ pip3 install -r requirements.txt
 
 ```
 
-4. Open up 4 terminals.
+### Hands-On session
 
-5. On `Terminal 1`, start up the ganache test net. You may specify the number of accounts that you
-   would like to generate, which, in our case, is 100.
+4. Open up 3 terminals. The first terminal (`Terminal 1`) will be used to simulate the server, the second terminal will be used to simulate the user (`Terminal 2`) and the third terminal will be used to simulate the miner (`Terminal 3`).
+
+5. On `Terminal 1`, we will load the local ganache server using the following code. You need to specify the number of accounts that you would like to generate. For example, if I want to start 100 accounts, I will indicate 100.
 
 ```sh
 
-$ cd testnet # Enter the testnet directory
-$ sh start_gananche_testnet.sh 100 # Start up the ganache test net
+cd testnet # Enter the testnet directory
+sh start_gananche_testnet.sh 100 # Start up the ganache test net
 
 
 ```
 
 Upon successful set up, you should see the following
 
-<img width="826" alt="Screenshot 2022-10-31 at 12 44 18 PM" src="https://user-images.githubusercontent.com/88195289/198932873-3322aa4c-c60e-418b-92f0-5bd38d89884e.png">
-
-6. On `Terminal 2`, to log down the information, execute the following command.
-
 ```sh
 
-$ tail -f logs.log
+Accounts and keys saved to ./keys.json
+
+HD Wallet
+==============
+Mnemonic:
+Base HD Path:
+
+Default Gas Price
+==============
+
+BlockGas Limit
+==============
+
+Call Gas Limit
+==============
+
+ChainId
+==============
+
+RPC Listening on
 
 ```
 
-7. On `Terminal 3`, deploy the LCSOverPass on Truffle network
+6. To simulate the user, we would need to run the python file `demo.py` with the argument `LCSOverPass` on `Terminal 2`.
 
 ```sh
 $ python3 demo.py LCSOverPass
 
 ```
 
-You should see the following after you have executed the command successfully.
+Upon successful execution, you should see the following.
 
 ```sh
 
@@ -136,16 +152,15 @@ times_to_delegate:
 
 ```
 
-8. On `Terminal 4`, we can play the role of a miner and listen to the
-   contracct deployed on `Terminal 2` using the following command.
+7. Before we indicate the number of times to delegate, we need to have a miner to listen to the contract address. Therefore, on `Terminal 3`, we can simulate the role of a miner by running the `demo.py` file with the `miner` argument.
 
 ```sh
 
-$ python3 demo.py LCSOverPassMiner
+$ python3 demo.py miner
 
 ```
 
-You should see the following:
+Upon successful execution, you should see the following code.
 
 ```sh
 
@@ -158,25 +173,30 @@ Available orders:
 
 ```
 
-We can set the configurations, such as listening to the
-contract address using the following
+8. Copy the contract address from `Terminal 2`. On `Terminal 3`, we run the following command to listen to the address block.
 
 ```sh
 
-Order: listen 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab # The address is from Terminal 3
+Order: listen 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab # The address is from Terminal 2
 
 ```
 
-After this, we should see the following:
+Upon successful execution, we should receive the following code.
 
 ```sh
 
 Start listening on address: 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
+Available orders:
+1. listen <contract_address>
+2. unlisten <contract_address>
+3. min_incentive <min_incentive>
+4. maximum_duration <maximum_duration>
+5. get_incentive
+
 
 ```
 
-9. Specify the number of questions that you would like to model on `Terminal 3`,
-   which for our case is 1.
+9. Return to `Terminal 2`. As the user, specify the number of times you would like to delegate the task.
 
 ```sh
 
@@ -187,15 +207,42 @@ times_to_delegate: 1
 
 After you press enter, you should see something like this on `Terminal 3`.
 
-<img width="826" alt="Screenshot 2022-10-31 at 12 40 25 PM" src="https://user-images.githubusercontent.com/88195289/198932572-a0f523c3-e85b-4d21-bd4f-5bd911e2c806.png">
+```sh
+
+test case: 1
+s1 len: 40
+s2 len: 90
+Gas used:  479193
+LCSOverPass: Average Gas Used for 1 testcases is: 479193.0
+Approximate Weis for one test one testcast is: 3.9773019e+16
+
+```
 
 On `Terminal 1`, you should see the following.
 
-<img width="826" alt="Screenshot 2022-10-31 at 12 43 32 PM" src="https://user-images.githubusercontent.com/88195289/198932724-cd448ee9-5b12-4bf4-a485-7bcdce10deb4.png">
+```sh
 
-On `Terminal 2`, you should see the following
+  Transaction: 0xc761a8adfcb9fc0650b6ed00d278b14c70b3ef0119ad2471eacff25223cdcf54
+  Gas usage: 145104
+  Block number: 3
+  Block time: Thu Nov 10 2022 00:07:30 GMT+0800 (Singapore Standard Time)
 
-<img width="826" alt="Screenshot 2022-10-31 at 1 51 02 PM" src="https://user-images.githubusercontent.com/88195289/198944446-140ada77-af0d-4776-bf0d-06705c3c7397.png">
+```
+
+Miners are incentivised to provide a more efficient solution. Supposed the solution is more effective than the current solution, they can execute `get_incentive` to get the rewards.
+
+```sh
+
+Order:get_incentive
+totalIncentiveGot: 100000000000000000 # In wei
+Available orders:
+ 1. listen <contract_address>
+ 2. unlisten <contract_address>
+ 3. min_incentive <min_incentive>
+ 4. maximum_duration <maximum_duration>
+ 5. get_incentive
+
+```
 
 ## Section 5: Remarks<a name="section-4-remarks"></a>
 
