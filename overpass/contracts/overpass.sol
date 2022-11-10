@@ -16,6 +16,7 @@ abstract contract OverPass {
         uint computePeriod;
     }
 
+
     event postNewQuestion(uint256 taskId, uint incentive, uint approxGasFee, uint computePeriod, string[] taskParameters);
     event updateQuestionAnswer(uint256 taskId, uint bestAnswer, address bestAdvisor);
     event complateQuestion(uint256 taskId, uint bestAnswer, address bestAdvisor);
@@ -25,10 +26,13 @@ abstract contract OverPass {
     mapping(uint256=>Task) internal tasks;
 
     uint internal nonce=1;
-    string problemName;
 
-    constructor(string memory _problemName) {
-        problemName = _problemName;
+    // First eight hex of keccak-256(problemName(<problem input data types>))
+    bytes problemSig;
+
+    constructor(bytes memory _problemSig) {
+        require(_problemSig.length==8, "Illegal length of problemSig");
+        problemSig = _problemSig;
 
     }
 
