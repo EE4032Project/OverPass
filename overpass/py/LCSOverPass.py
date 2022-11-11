@@ -1,7 +1,7 @@
 '''
 MIT License
 
-Copyright (c) 2022 EE4032 Group 8
+Copyright (c) 2022 OverPass-Project
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ SOFTWARE.
 
 '''
 
+from Crypto.Hash import keccak
 import json
 import logging
 import os
@@ -41,6 +42,7 @@ from web3.gas_strategies.time_based import medium_gas_price_strategy
 
 from overpass.py.constant import MIDIUM_GAS_PRICE_ESTIMATOR_ON, HTTP_PROVIDER, STD_LOGGING_ON,FILE_LOGGING_ON, GAS_PRICE_STRATEGY_ON, API_KEY
 from overpass.py.utils import thread_with_trace, lock, get_testcase, OverPassException
+
 
 
 # An LCSOverPass Wrapper for user to easily deploy and calculate LCS
@@ -83,6 +85,10 @@ class LCSOverPass:
         self.w3.middleware_onion.add(middleware.simple_cache_middleware)
         self.nonce = self.w3.eth.getTransactionCount(self.my_address) -1
         self.feePerGas = self.estimateGasPrice() if GAS_PRICE_STRATEGY_ON else self.w3.eth.gas_price
+
+        keccak_hash = keccak.new(digest_bits=256)
+        keccak_hash.update(b'lcs(string,string)')
+        self.problemSig=keccak_hash.hexdigest()[0:8]
 
     @staticmethod
     def estimateGasPrice():
@@ -172,8 +178,8 @@ class LCSOverPass:
     # delegate a contract
     def delegate_compute(self, str1:str, str2: str, _incentive: int):
         self.updateNonce()
-        gasLimit = int(min((max(len(str1),len(str2))*2/10000+1)*3*10**6, self.w3.eth.get_block('latest')['gasLimit']) )
-        transaction = self.overpass_instance.functions.delegate_compute(['LCS',str1,str2], 2).buildTransaction(
+        gasLimit = int(min((max(len(str1),len(str2))*2/10000+1)*3*10**6, self.w3.eth.get_block('latest')['gasLimit']))
+        transaction = self.overpass_instance.functions.delegate_compute([self.problemSig,str1,str2], 2).buildTransaction(
             {"chainId": self.chain_id, "from": self.my_address, "gasPrice": int(self.feePerGas), "nonce":  self.nonce, "gas": gasLimit, "value":_incentive})
         signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)

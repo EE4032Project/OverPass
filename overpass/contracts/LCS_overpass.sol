@@ -5,8 +5,8 @@ import "./overpass.sol";
 
 
 contract LCSOverPass is OverPass{
-
-    constructor() OverPass(("LCS")) {
+    // 6c633bc4 is first eight hex of keccak-256(problemName(lcs(string,string))
+    constructor() OverPass(("6c633bc4")) {
     }
 
     mapping(uint=>uint) answers;
@@ -80,13 +80,12 @@ contract LCSOverPass is OverPass{
         }
         return true;
     }
-
-    // keccak256(abi.encodePacked("LCS"))
-    bytes32 private constant _LCS = 0x816a2b01920faffdf630c9d96404a778baf08493254365c589e0d4366da539ed;
+   
     uint MAX_STR_LEN = 1001;
     // called by other smart contract to compute specified algorithm with parameters
     function delegate_compute(string[] memory taskParameters, uint _computePeriod) payable public override returns (uint256) {
-        require(taskParameters.length==3 && keccak256(abi.encodePacked((taskParameters[0])))==_LCS, "Wrong delegated task.");
+        bytes memory _problemSig =  bytes(taskParameters[0]);
+        require(taskParameters.length==3 && _problemSig.length==problemSig.length && keccak256(_problemSig)==keccak256(problemSig), "Wrong delegated task.");
         bytes memory s1  = bytes(taskParameters[1]);
         bytes memory s2 = bytes(taskParameters[2]);
         require(s1.length<MAX_STR_LEN && s2.length<MAX_STR_LEN, "String too long.");
